@@ -6,9 +6,15 @@ import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
 import tamaguiConfig from "tamagui.config";
 import { StatusBar } from "react-native";
+import { Stack } from "expo-router";
 
 const StackLayout = () => {
-  return <Slot />;
+  return (
+    <Stack>
+      <Stack.Screen name="(root)" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+    </Stack>
+  );
 };
 
 export default function Layout() {
