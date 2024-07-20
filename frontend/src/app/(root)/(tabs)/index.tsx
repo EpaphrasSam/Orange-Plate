@@ -1,16 +1,13 @@
 import React from "react";
 import {
   SafeAreaView,
-  ScrollView,
   View,
   Text,
   StyleSheet,
   Image,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Icon } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import HomeCard from "@/components/HomeCard";
 
@@ -51,41 +48,6 @@ const imageData = [
 
 // You can now pass `imageData` to the GridImageComponent as follows:
 
-const data = [
-  {
-    id: "1",
-    title: "Fried Rice",
-    imageUrl:
-      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
-  },
-  {
-    id: "2",
-    title: "Jollof Rice",
-    imageUrl:
-      "C:Users\vamoaDesktopAppsOrange-Plate\frontendsrcassetssplash.png",
-  },
-  {
-    id: "3",
-    title: "Pizza",
-    imageUrl:
-      "C:Users\vamoaDesktopAppsOrange-Plate\frontendsrcassetssplash.png",
-  },
-  {
-    id: "4",
-    title: "Burger",
-    imageUrl:
-      "C:Users\vamoaDesktopAppsOrange-Plate\frontendsrcassetssplash.png",
-  },
-];
-
-// Header component
-const Header = ({ title }: { title: string }) => (
-  <View style={styles.headerContainer}>
-    <Text style={styles.headerText}>{title}</Text>
-  </View>
-);
-
-// Category menu component
 const CategoryMenu = () => (
   <View style={styles.menuContainer}>
     {categories.map((category, index) => (
@@ -110,27 +72,11 @@ const CategoryMenu = () => (
   </View>
 );
 
-// Cuisine list component
-const CuisineList = () => (
-  <FlatList
-    data={data}
-    renderItem={({ item }) => (
-      <View style={styles.itemContainer}>
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
-        <Text style={styles.title}>{item.title}</Text>
-      </View>
-    )}
-    keyExtractor={(item) => item.id}
-  />
-);
-
 // App component
 const Home = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      {/* <ScrollView style={styles.scrollView}> */}
-
-      <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-4 ">
+    <SafeAreaView className="bg-white h-full flex ">
+      <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-4">
         <LinearGradient
           colors={["#F29D38", "rgba(242, 157, 56, 0.5)", "#F29D38"]}
           start={{ x: 0, y: 0 }} // Start of gradient (left side)
@@ -152,44 +98,33 @@ const Home = () => {
       </View>
       <CategoryMenu />
       <HomeCard images={imageData} />
-      {/* </ScrollView> */}
     </SafeAreaView>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
     backgroundColor: "#fff",
   },
   scrollView: {
     marginHorizontal: 10,
   },
-  headerContainer: {
-    padding: 20,
-    backgroundColor: "orange",
-    alignItems: "center",
+
+  category: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: "#F29D38",
   },
-  headerText: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
+
   menuContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
     padding: 10,
   },
-  button: {
-    borderWidth: 2,
-    borderColor: "#F29D38",
-    padding: 10,
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: "black",
-  },
+
   itemContainer: {
     flexDirection: "row",
     padding: 10,

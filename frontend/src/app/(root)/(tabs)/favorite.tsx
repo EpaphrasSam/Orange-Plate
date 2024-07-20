@@ -30,12 +30,12 @@ const products: Product[] = [
 ];
 const Favorite = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView className="bg-white " style={{ flex: 1 }}>
       <ScrollView contentInsetAdjustmentBehavior="automatic">
-        <Text className="text-black text-2xl font-bold  justify-center mt-4 mb-10 text-center">
+        <Text className="text-black text-2xl font-bold  justify-center mt-10 mb-6 text-center ">
           Favorite
         </Text>
-        <Divider bold className="mb-3 " />
+        <Divider bold className="mb-6  " />
         {products.map((product, index) => (
           <ProductCard
             key={index}

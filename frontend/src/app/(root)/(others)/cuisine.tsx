@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import FoodGridComponent from "@/components/CuisineCard";
-import { Text, View } from "react-native";
-
-import { SearchComponent } from "@/components/SearchComponent";
-import algoliasearch from "algoliasearch/lite";
-import { InstantSearch } from "react-instantsearch-hooks";
-
-const searchClient = algoliasearch("ApplicationID", "SearchOnlyAPIKey");
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const foodItems = [
   {
@@ -52,13 +48,46 @@ const Cuisine = () => {
 
   return (
     <View>
-      <Text className="justify-center self-center">Cuisine</Text>
-      <View className="flex flex-row justify-evenly">
-        <Text>Popular</Text>
-        <Text>Burgers</Text>
-        <Text>Chicken</Text>
-        <Text>Fries</Text>
-        <Text></Text>
+      <Text className="text-black text-2xl font-bold  justify-center mt-10 mb-10 text-center ">
+        Cuisine
+      </Text>
+      <View className="flex flex-row justify-evenly mb-10">
+        <TouchableOpacity>
+          <Text className="bg-yellow-500 px-6 py-2 rounded-full text-white">
+            Popular
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text className="font-bold">Burgers</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text className="font-bold">Chicken</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text className="font-bold">Fries</Text>
+        </TouchableOpacity>
+      </View>
+      <View className="self-center justify-center w-4/5 flex flex-row">
+        <View className="flex flex-row border-2 border-gray-300 w-full justify-between self-center px-10 rounded-3xl">
+          <TextInput
+            placeholder="Search for dishes"
+            placeholderTextColor="#A9A9A9"
+            style={{ flex: 1, padding: 10, fontSize: 16, color: "gray" }}
+            className="flex-1 px-8 text-10 text-gray-300"
+          />
+          <MaterialCommunityIcons
+            name="magnify"
+            size={24}
+            color="#F29D38"
+            className="self-center"
+          />
+        </View>
+        <MaterialCommunityIcons
+          name="menu"
+          size={30}
+          color="white"
+          className="self-center ml-2 bg-yellow-500 rounded-full "
+        />
       </View>
 
       <FoodGridComponent items={foodItems} />

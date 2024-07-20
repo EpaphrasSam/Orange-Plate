@@ -5,13 +5,19 @@ import { Slot } from "expo-router";
 import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
 import tamaguiConfig from "tamagui.config";
-import { StatusBar } from "react-native";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 
 const StackLayout = () => {
   return (
     <Stack>
-      <Stack.Screen name="(root)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="(root)"
+        options={{
+          headerShown: false,
+          contentStyle: { paddingTop: 0 },
+        }}
+      />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
     </Stack>
   );
@@ -26,8 +32,16 @@ export default function Layout() {
 
   useEffect(() => {
     const prepareApp = async () => {
+      // Prevent the splash screen from auto-hiding
+      await SplashScreen.preventAutoHideAsync();
+
       if (fontsLoaded) {
         setAppIsReady(true);
+
+        setTimeout(async () => {
+          // Hide the splash screen once the app is ready
+          await SplashScreen.hideAsync();
+        }, 500); // you can control the delay here
       }
     };
 
@@ -37,6 +51,7 @@ export default function Layout() {
   if (!appIsReady) {
     return null;
   }
+
   return (
     <TamaguiProvider config={tamaguiConfig}>
       <StackLayout />

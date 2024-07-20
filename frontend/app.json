@@ -16,6 +16,11 @@
       ]
     ],
     "name": "orange-plate",
-    "slug": "orange-plate"
+    "slug": "orange-plate",
+    "splash": {
+      "image": "./src/assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    }
   }
 }

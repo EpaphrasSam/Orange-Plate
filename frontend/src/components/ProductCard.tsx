@@ -12,7 +12,7 @@ const ProductCard = ({ imageUri, detail, price }: ProductCardProps) => {
     <View className="rounded-lg bg-yellow-500 truncate w-4/5 self-center mb-20 shadow-xl">
       <Image source={{ uri: imageUri }} className="w-full h-48" />
       <Text style={styles.detailText}>{detail}</Text>
-      <Text style={styles.priceText}>Q{price.toFixed(2)}</Text>
+      <Text style={styles.priceText}>₵{price.toFixed(2)}</Text>
     </View>
   );
 };
