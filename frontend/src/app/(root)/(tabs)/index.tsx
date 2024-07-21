@@ -6,10 +6,13 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import HomeCard from "@/components/HomeCard";
+import { ScrollView } from "tamagui";
+import RestaurantCard from "@/components/RestaurantCard";
 
 type Category = {
   id: string;
@@ -22,6 +25,43 @@ const categories: Category[] = [
   { id: "2", title: "Western", Icon: "pizza" },
   { id: "3", title: "Desserts", Icon: "glass-flute" },
   { id: "4", title: "Local", Icon: "food-steak" },
+];
+const restaurants = [
+  {
+    id: 1,
+    imageUri:
+      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
+    title: "Pizzaman",
+    rating: 4,
+  },
+  {
+    id: 2,
+    imageUri:
+      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
+    title: "Chickenman",
+    rating: 5,
+  },
+  {
+    id: 3,
+    imageUri:
+      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
+    title: "Burger Boss",
+    rating: 3,
+  },
+  {
+    id: 4,
+    imageUri:
+      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
+    title: "Sushi Star",
+    rating: 5,
+  },
+  {
+    id: 5,
+    imageUri:
+      "https://img.freepik.com/free-photo/grilled-gourmet-burger-with-cheese-tomato-onion-french-fries-generated-by-artificial-intelligence_25030-63181.jpg?t=st=1720015786~exp=1720019386~hmac=f70eb9316d5b98a2abb3e350b0d0d78ca79db534a66a56751f88c340dbee9b9e&w=1380",
+    title: "Taco Time",
+    rating: 4,
+  },
 ];
 const imageData = [
   {
@@ -74,30 +114,49 @@ const CategoryMenu = () => (
 
 // App component
 const Home = () => {
+  const renderItem = ({ item }) => (
+    <RestaurantCard
+      imageUri={item.imageUri}
+      title={item.title}
+      rating={item.rating}
+    />
+  );
   return (
     <SafeAreaView className="bg-white h-full flex ">
-      <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-4">
-        <LinearGradient
-          colors={["#F29D38", "rgba(242, 157, 56, 0.5)", "#F29D38"]}
-          start={{ x: 0, y: 0 }} // Start of gradient (left side)
-          end={{ x: 1, y: 0 }} // End of
-          style={{
-            alignItems: "center",
-            borderRadius: 20,
-            justifyContent: "center",
-            alignContent: "center",
-          }}
-        >
-          <Image
-            source={require("../../../assets/img1.png")}
-            className="w-3/5 h-full
+      <ScrollView>
+        <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-4">
+          <LinearGradient
+            colors={["#F29D38", "rgba(242, 157, 56, 0.5)", "#F29D38"]}
+            start={{ x: 0, y: 0 }} // Start of gradient (left side)
+            end={{ x: 1, y: 0 }} // End of
+            style={{
+              alignItems: "center",
+              borderRadius: 20,
+              justifyContent: "center",
+              alignContent: "center",
+            }}
+          >
+            <Image
+              source={require("../../../assets/img1.png")}
+              className="w-3/5 h-full
              self-center  justify-center mb-1 "
-            resizeMode="contain"
-          />
-        </LinearGradient>
-      </View>
-      <CategoryMenu />
-      <HomeCard images={imageData} />
+              resizeMode="contain"
+            />
+          </LinearGradient>
+        </View>
+        <CategoryMenu />
+        <HomeCard images={imageData} />
+        <View className="p-4">
+          <Text className="text-black font-bold text-lg">Restaurants</Text>
+        </View>
+        <FlatList
+          className="p-5"
+          data={restaurants}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          numColumns={2}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };

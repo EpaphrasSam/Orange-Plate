@@ -22,6 +22,7 @@ type Props = {
 };
 
 const FoodGridComponent: React.FC<Props> = ({ items }) => {
+  console.log(items);
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image
@@ -52,7 +53,7 @@ const FoodGridComponent: React.FC<Props> = ({ items }) => {
           marginHorizontal: 10,
         }}
       >
-        {item.subtitle}
+        {item.restaurants}
       </Text>
       <View
         style={{
@@ -72,9 +73,9 @@ const FoodGridComponent: React.FC<Props> = ({ items }) => {
         >
           {item.price}
         </Text>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <MaterialCommunityIcons name="menu-down" size={24} color="black" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

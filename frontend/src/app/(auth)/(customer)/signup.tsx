@@ -71,8 +71,8 @@ const SignUp = () => {
                     setFormattedValue(text);
                   }}
                   withDarkTheme
-                  withShadow
-                  autoFocus
+                  // withShadow
+                  // autoFocus
                   containerStyle={{
                     width: "83.3%",
                     justifyContent: "center",
@@ -98,7 +98,7 @@ const SignUp = () => {
               <View className="self-contain items-center mt-3">
                 <Text>
                   Already have an account?{" "}
-                  <Link href="/login" className="text-yellow-500">
+                  <Link href="/signin" className="text-yellow-500">
                     Sign in
                   </Link>
                 </Text>

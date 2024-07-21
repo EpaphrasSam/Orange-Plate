@@ -43,7 +43,7 @@ const Login = () => (
         </TouchableOpacity>
         <Text className="ml-6 mt-4">
           Don't have an account?{" "}
-          <Link href="/signin" className="text-yellow-500">
+          <Link href="/register" className="text-yellow-500">
             Sign Up
           </Link>
         </Text>

@@ -19,7 +19,7 @@ const Login = () => (
       resizeMode="cover"
       className="justify-center w-full h-full"
     >
-      <View className="self-center w-4/5 h-1/2 bg-slate-50 rounded-lg">
+      <View className="self-center w-4/5 h-[320] bg-slate-50 rounded-lg">
         <Text className="text-black text-2xl font-bold  justify-center mt-4  text-center">
           Sign In
         </Text>
@@ -35,12 +35,10 @@ const Login = () => (
           h-12 border-2 border-gray-300 w-5/6 self-center"
           ></TextInput>
         </View>
-        <TouchableOpacity
-          className="bg-yellow-400 w-11/12 self-center rounded-lg
-          h-12   border-2 border-gray-300 mt-6 items-center justify-items-center"
-        >
-          <Text className=" text-white text-xl">Log In</Text>
+        <TouchableOpacity className="bg-yellow-400 w-11/12 self-center rounded-lg h-12 border-2 border-gray-300 mt-6 flex items-center justify-center">
+          <Text className="text-white text-xl">Log In</Text>
         </TouchableOpacity>
+
         <Text className="ml-6 mt-4">
           Don't have an account?{" "}
           <Link href="/signup" className="text-yellow-500">
