@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import CartItem from "@/components/CartCard";
 import { SafeAreaView } from "react-native";
+import { Link } from "expo-router";
 
 // Example cart items data
 const cartItems = [

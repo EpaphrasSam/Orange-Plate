@@ -5,6 +5,7 @@ export default function OtherLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="cuisine" />
       <Stack.Screen name="detail" />
+      <Stack.Screen name="restaurant" />
     </Stack>
   );
 }

@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 
 type FoodItem = {
   id: string;
@@ -22,61 +23,62 @@ type Props = {
 };
 
 const FoodGridComponent: React.FC<Props> = ({ items }) => {
-  console.log(items);
+  // console.log(items);
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <Image
-        source={{ uri: item.imageUrl }}
-        style={{
-          width: "100%",
-          height: 150,
-          resizeMode: "cover",
-        }}
-      />
-      <View style={{ position: "absolute", top: 10, right: 10 }}>
-        <Feather name="heart" size={24} color="red" />
-      </View>
-      <Text
-        style={{
-          fontWeight: "bold",
-          fontSize: 16,
-          marginHorizontal: 10,
-          marginTop: 10,
-        }}
-      >
-        {item.title}
-      </Text>
-      <Text
-        style={{
-          fontSize: 14,
-          color: "gray",
-          marginHorizontal: 10,
-        }}
-      >
-        {item.restaurants}
-      </Text>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingHorizontal: 10,
-          marginBottom: 10,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 16,
-            color: "#FF6347",
-            fontWeight: "bold",
-          }}
-        >
-          {item.price}
-        </Text>
-        {/* <TouchableOpacity>
-          <MaterialCommunityIcons name="menu-down" size={24} color="black" />
-        </TouchableOpacity> */}
-      </View>
+      <Link href="/detail" asChild>
+        <TouchableOpacity>
+          <Image
+            source={{ uri: item.imageUrl }}
+            style={{
+              width: "100%",
+              height: 150,
+              resizeMode: "cover",
+            }}
+          />
+          <View style={{ position: "absolute", top: 10, right: 10 }}>
+            <Feather name="heart" size={24} color="red" />
+          </View>
+          <Text
+            style={{
+              fontWeight: "bold",
+              fontSize: 16,
+              marginHorizontal: 10,
+              marginTop: 10,
+            }}
+          >
+            {item.title}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "gray",
+              marginHorizontal: 10,
+            }}
+          >
+            {item.restaurants}
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingHorizontal: 10,
+              marginBottom: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: "#FF6347",
+                fontWeight: "bold",
+              }}
+            >
+              {item.price}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 

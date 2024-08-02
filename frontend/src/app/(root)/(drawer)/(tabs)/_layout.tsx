@@ -2,34 +2,15 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import { Image, View, Text } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Drawer } from "expo-router/drawer";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#FCAF01",
-        headerShown: true,
-        headerTitle: () => (
-          <View className="w-full flex flex-row justify-evenly self-center items-center ">
-            <View className="ml-8">
-              <Image
-                source={require("../../../assets/man.jpg")}
-                className="w-10 h-10"
-              />
-            </View>
-            <View>
-              <Text className="text-xl font-bold">OrangePlate</Text>
-            </View>
-            <View>
-              <MaterialCommunityIcons
-                name="bell"
-                size={20}
-                color="#F29D38"
-                className="bg-white rounded-full"
-              />
-            </View>
-          </View>
-        ),
+        headerShown: false, // Show header
       }}
     >
       <Tabs.Screen

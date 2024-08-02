@@ -89,7 +89,7 @@ const imageData = [
 // You can now pass `imageData` to the GridImageComponent as follows:
 
 const CategoryMenu = () => (
-  <View style={styles.menuContainer}>
+  <View className="flex flex-row p-3 justify-around">
     {categories.map((category, index) => (
       <View
         key={category.id}
@@ -124,7 +124,7 @@ const Home = () => {
   return (
     <SafeAreaView className="bg-white h-full flex ">
       <ScrollView>
-        <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-4">
+        <View className="w-full h-[180px] rounded-3xl self-center justify-center px-3 mb-2">
           <LinearGradient
             colors={["#F29D38", "rgba(242, 157, 56, 0.5)", "#F29D38"]}
             start={{ x: 0, y: 0 }} // Start of gradient (left side)
@@ -137,7 +137,7 @@ const Home = () => {
             }}
           >
             <Image
-              source={require("../../../assets/img1.png")}
+              source={require("../../../../assets/img1.png")}
               className="w-3/5 h-full
              self-center  justify-center mb-1 "
               resizeMode="contain"
@@ -150,11 +150,12 @@ const Home = () => {
           <Text className="text-black font-bold text-lg">Restaurants</Text>
         </View>
         <FlatList
-          className="p-5"
+          className="p-4 mb-4"
           data={restaurants}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
+          contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 10 }}
         />
       </ScrollView>
     </SafeAreaView>
