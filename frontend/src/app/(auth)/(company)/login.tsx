@@ -39,7 +39,9 @@ const Login = () => (
           className="bg-yellow-400 w-11/12 self-center rounded-lg
           h-12   border-2 border-gray-300 mt-6 items-center justify-items-center"
         >
-          <Text className=" text-white text-xl">Register</Text>
+          <Link href="/dashboard" className=" items-center justify-center">
+            <Text className=" text-white text-xl">Sign In</Text>
+          </Link>
         </TouchableOpacity>
         <Text className="ml-6 mt-4">
           Don't have an account?{" "}

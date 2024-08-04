@@ -25,7 +25,7 @@ export default function Layout() {
               <Text className="text-xl font-bold flex-1 text-center mr-10">
                 OrangePlate
               </Text>
-              <Link href="/customeroption" asChild>
+              <Link href="/bothoption" asChild>
                 <TouchableOpacity onPress={handleLogout}>
                   <MaterialCommunityIcons
                     name="logout"

@@ -5,6 +5,7 @@ export default function CompanyAuthLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(company)" />
       <Stack.Screen name="(customer)" />
+      <Stack.Screen name="bothoption" />
     </Stack>
   );
 }

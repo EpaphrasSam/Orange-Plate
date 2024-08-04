@@ -33,7 +33,7 @@ const CustomerOption = () => (
         </Text>
         <View className="items-center justify-center self-center mt-2 px-4 mb-4">
           <Text className="">
-            Welcome to OrangePlate for Restaurants. Serve more, Grow faster.
+            Welcome to OrangePlate for Customers. Serve more, Grow faster.
           </Text>
         </View>
 

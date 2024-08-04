@@ -34,12 +34,16 @@ const CompanyOption = () => (
         <View className="flex flex-row w-full justify-between gap-4 items-center px-4">
           <View className="flex-1">
             <TouchableOpacity className="bg-yellow-400 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
-              <Text className="text-white">Sign In</Text>
+              <Link href="/login" className=" items-center justify-center">
+                <Text className="text-white">Sign In</Text>
+              </Link>
             </TouchableOpacity>
           </View>
           <View className="flex-1">
             <TouchableOpacity className="bg-green-400 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
-              <Text className="text-white">Registration</Text>
+              <Link href="/register" className=" items-center justify-center">
+                <Text className="text-white">Registration</Text>
+              </Link>
             </TouchableOpacity>
           </View>
         </View>
