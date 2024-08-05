@@ -22,10 +22,10 @@ export default function Layout() {
             <View className="flex-row items-center justify-between w-full px-4">
               <View className="w-10 h-10"></View>
               {/* Placeholder matching the menu icon size */}
-              <Text className="text-xl font-bold flex-1 text-center mr-10">
+              <Text className="text-xl font-bold flex-1 text-center ">
                 OrangePlate
               </Text>
-              <Link href="/bothoption" asChild>
+              {/* <Link href="/bothoption" asChild>
                 <TouchableOpacity onPress={handleLogout}>
                   <MaterialCommunityIcons
                     name="logout"
@@ -34,8 +34,20 @@ export default function Layout() {
                     className="bg-white rounded-full p-2"
                   />
                 </TouchableOpacity>
-              </Link>
+              </Link> */}
             </View>
+          ),
+          headerRight: () => (
+            <Link href="/bothoption" asChild>
+              <TouchableOpacity onPress={handleLogout}>
+                <MaterialCommunityIcons
+                  name="logout"
+                  size={25}
+                  color="#F29D38"
+                  className="bg-white rounded-full p-2"
+                />
+              </TouchableOpacity>
+            </Link>
           ),
         }}
       />

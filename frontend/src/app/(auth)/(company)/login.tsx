@@ -19,19 +19,19 @@ const Login = () => (
       resizeMode="cover"
       className="justify-center w-full h-full"
     >
-      <View className="self-center w-4/5 h-1/2 bg-slate-50 rounded-lg">
+      <View className="self-center w-4/5 h-[320] bg-slate-50 rounded-lg">
         <Text className="text-black text-2xl font-bold  justify-center mt-4  text-center">
           Sign In
         </Text>
         <View>
           <Text className="text-black text-md  ml-6 mt-4  ">Email</Text>
           <TextInput
-            className="text-black text-xl   justify-center mt-2   rounded-lg
+            className="text-black text-xl   justify-center mt-2 px-3  rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
           ></TextInput>
           <Text className="text-black text-md   ml-6 mt-4  ">Password</Text>
           <TextInput
-            className="text-black text-xl   justify-center mt-2   rounded-lg
+            className="text-black text-xl   justify-center mt-2  px-3  rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
           ></TextInput>
         </View>

@@ -46,7 +46,7 @@ const CustomerOption = () => (
             </TouchableOpacity>
           </View>
           <View className="flex-1">
-            <TouchableOpacity className="bg-green-400 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
+            <TouchableOpacity className="bg-green-600 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
               <Link href="/signup" className="text-white">
                 Registration
               </Link>

@@ -6,7 +6,6 @@ export default function CompanyAuthLayout() {
       <Stack.Screen name="register" />
       <Stack.Screen name="login" />
 
-      <Stack.Screen name="dashboard" />
       <Stack.Screen name="companyoption" />
     </Stack>
   );

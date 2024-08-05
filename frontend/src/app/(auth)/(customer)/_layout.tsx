@@ -6,6 +6,7 @@ export default function CustomerAuthLayout() {
       <Stack.Screen name="signin" />
       <Stack.Screen name="signup" />
       <Stack.Screen name="customeroption" />
+      <Stack.Screen name="bothoption" />
     </Stack>
   );
 }

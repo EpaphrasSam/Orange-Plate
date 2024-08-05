@@ -19,6 +19,7 @@ const StackLayout = () => {
         }}
       />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(companyroot)" options={{ headerShown: false }} />
     </Stack>
   );
 };

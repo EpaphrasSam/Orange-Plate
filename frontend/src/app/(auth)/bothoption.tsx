@@ -33,11 +33,14 @@ const RestaurantCustomer = () => (
 
         <View className="w-full px-2 mt-6 ">
           <TouchableOpacity className="bg-yellow-400 rounded-lg flex h-12 items-center justify-center mb-4 border-2 border-gray-300">
-            <Link href="/login" className=" items-center justify-center">
+            <Link
+              href="/customeroption"
+              className=" items-center justify-center"
+            >
               <Text className="text-white text-center">Customer</Text>
             </Link>
           </TouchableOpacity>
-          <TouchableOpacity className="bg-green-700 rounded-lg flex h-12 items-center justify-center border-2 border-gray-300">
+          <TouchableOpacity className="bg-green-600 rounded-lg flex h-12 items-center justify-center border-2 border-gray-300">
             <Link
               href="/companyoption"
               className=" items-center justify-center"

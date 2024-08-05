@@ -39,26 +39,26 @@ const SignUp = () => {
                   Full name
                 </Text>
                 <TextInput
-                  className="text-black text-xl   justify-center mt-2   rounded-lg
+                  className="text-black text-xl   justify-center mt-2 px-3  rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
                 ></TextInput>
                 <Text className="text-black text-md  ml-6 mt-4  ">Email</Text>
                 <TextInput
-                  className="text-black text-xl   justify-center mt-2   rounded-lg
+                  className="text-black text-xl   justify-center mt-2   px-3  rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
                 ></TextInput>
                 <Text className="text-black text-md   ml-6 mt-4  ">
                   Password
                 </Text>
                 <TextInput
-                  className="text-black text-xl   justify-center mt-2   rounded-lg
+                  className="text-black text-xl   justify-center mt-2    px-3 rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
                 ></TextInput>
                 <Text className="text-black text-md   ml-6 mt-4  ">
                   Confirm Password
                 </Text>
                 <TextInput
-                  className="text-black text-xl   justify-center mt-2   rounded-lg
+                  className="text-black text-xl   justify-center mt-2   px-3 rounded-lg
           h-12 border-2 border-gray-300 w-5/6 self-center"
                 ></TextInput>
                 <Text className="text-black text-md   ml-6 mt-4  ">
@@ -76,8 +76,8 @@ const SignUp = () => {
                     setFormattedValue(text);
                   }}
                   withDarkTheme
-                  withShadow
-                  autoFocus
+                  // withShadow
+                  // autoFocus
                   containerStyle={{
                     width: "83.3%",
                     justifyContent: "center",

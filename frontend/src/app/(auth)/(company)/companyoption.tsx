@@ -21,7 +21,13 @@ const CompanyOption = () => (
       className="justify-center w-full h-full"
     >
       <View className="self-center w-4/5 h-1/3 p-4 bg-slate-50 rounded-lg">
-        <Image height={25} width={25} source={logo} resizeMode="cover" />
+        <Image
+          height={25}
+          width={25}
+          source={logo}
+          resizeMode="cover"
+          className="self-center "
+        />
         <Text className="text-black text-xl font-bold  justify-center mt-4  text-center">
           Orange Plate
         </Text>
@@ -40,7 +46,7 @@ const CompanyOption = () => (
             </TouchableOpacity>
           </View>
           <View className="flex-1">
-            <TouchableOpacity className="bg-green-400 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
+            <TouchableOpacity className="bg-green-600 w-full rounded-lg flex h-12 border-2 border-gray-300 items-center justify-center">
               <Link href="/register" className=" items-center justify-center">
                 <Text className="text-white">Registration</Text>
               </Link>
