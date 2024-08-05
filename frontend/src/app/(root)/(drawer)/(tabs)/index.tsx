@@ -11,7 +11,8 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import HomeCard from "@/components/HomeCard";
-import { ScrollView } from "tamagui";
+// import { ScrollView } from "tamagui";
+import { ScrollView } from "react-native-virtualized-view";
 import RestaurantCard from "@/components/RestaurantCard";
 
 type Category = {
@@ -154,14 +155,17 @@ const Home = () => {
           <View className="px-4">
             <Text className="text-black font-bold text-lg">Restaurants</Text>
           </View>
-          <FlatList
-            className="p-4 mb-4"
-            data={restaurants}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2}
-            contentContainerStyle={{ paddingHorizontal: 10, paddingBottom: 10 }}
-          />
+          <View className="flex-row flex-wrap justify-between mr-2">
+            {restaurants.map((item) => (
+              <View key={item.id} className="w-6/12  ">
+                <RestaurantCard
+                  imageUri={item.imageUri}
+                  title={item.title}
+                  rating={item.rating}
+                />
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

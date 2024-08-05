@@ -39,9 +39,9 @@ export default function CompanyLayout() {
       }}
     >
       <Stack.Screen
-        name="dashboard"
+        name="(companytabs)"
         options={{
-          headerShown: false,
+          headerShown: true,
           contentStyle: { paddingTop: 0 },
         }}
       />

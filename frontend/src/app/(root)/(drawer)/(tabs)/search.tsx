@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
   Pressable,
   Modal,
   StyleSheet,
@@ -18,6 +17,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import RestaurantCard from "@/components/RestaurantCard";
 import { Link } from "expo-router";
 import DropdownMenu from "@/components/Dropdown";
+import { ScrollView } from "react-native-virtualized-view";
 
 const restaurants = [
   {
