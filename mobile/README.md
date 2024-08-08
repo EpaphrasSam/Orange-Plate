@@ -1,8 +1,3 @@
-# restaurant_app
+# mobile
 
-Restaurant menu app
-
-## Getting Started
-
-``flutter clean ``
-```flutter run ```
+Mobile part of the project
