@@ -4,5 +4,5 @@ Restaurant menu app
 
 ## Getting Started
 
-''' flutter clean '''
-''' flutter run '''
+```flutter clean ```
+```flutter run ```
