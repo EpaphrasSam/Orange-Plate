@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <main className="flex gap-2">
+          <main className="flex max-sm:flex-col gap-4">
             <Sidebar />
             <div className="flex-1">{children}</div>
           </main>
