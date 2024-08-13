@@ -60,8 +60,7 @@ const dashboardData = {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
+    <main className="min-h-screen mt-6">
       <Dashboard data={dashboardData} />
     </main>
   );
