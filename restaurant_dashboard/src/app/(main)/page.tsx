@@ -4,41 +4,41 @@ import Dashboard from "@/components/pages/home/Dashboard";
 const dashboardData = {
   summary: [
     {
-      title: "Total Revenue (GHS)",
+      title: "Total Revenue (₵)",
       value: "3,262",
       icon: "FaMoneyBillWave",
     },
     { title: "Total Orders", value: "1,789", icon: "FaShoppingCart" },
     { title: "Daily Sales", value: "5,678", icon: "FaChartLine" },
-    { title: "Total Income (GHS)", value: "7,834", icon: "FaWallet" },
+    { title: "Total Income (₵)", value: "7,834", icon: "FaWallet" },
   ],
   recentOrders: [
     {
       id: "1",
       customer: "John Doe",
       items: "2x Burger, 1x Fries",
-      total: "GHS 56.78",
+      total: "₵ 56.78",
       status: "Completed",
     },
     {
       id: "2",
       customer: "Jane Smith",
       items: "1x Pizza, 2x Coke",
-      total: "GHS 89.99",
+      total: "₵ 89.99",
       status: "Processing",
     },
     {
       id: "3",
       customer: "Bob Johnson",
       items: "3x Tacos, 1x Salad",
-      total: "GHS 34.50",
+      total: "₵ 34.50",
       status: "Pending",
     },
     {
       id: "4",
       customer: "Alice Brown",
       items: "1x Steak, 1x Wine",
-      total: "GHS 78.20",
+      total: "₵ 78.20",
       status: "Completed",
     },
   ],
