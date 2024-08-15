@@ -41,15 +41,15 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
       case OrderStatus.OnProcess:
-        return "bg-gray-200 text-gray-800";
+        return "bg-gray-100 text-gray-800";
       case OrderStatus.InDelivery:
-        return "bg-orange-200 text-orange-800";
+        return "bg-orange-100 text-orange-800";
       case OrderStatus.Completed:
-        return "bg-green-200 text-green-800";
+        return "bg-green-100 text-green-800";
       case OrderStatus.Rejected:
-        return "bg-red-200 text-red-800";
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-200 text-gray-800";
+        return "bg-gray-100 text-gray-800";
     }
   };
 
