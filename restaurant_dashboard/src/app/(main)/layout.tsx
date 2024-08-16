@@ -13,7 +13,7 @@ export default function MainLayout({
       <div className="hidden md:block sticky top-0 h-screen">
         <Sidebar />
       </div>
-      <div className="flex-1 bg-white p-4 overflow-auto">{children}</div>
+      <div className="flex-1 bg-white p-4">{children}</div>
     </main>
   );
 }
