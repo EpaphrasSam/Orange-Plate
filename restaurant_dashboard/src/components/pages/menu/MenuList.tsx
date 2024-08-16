@@ -8,6 +8,7 @@ import { Input, Button } from "@nextui-org/react";
 import { Drawer, useMediaQuery, useTheme } from "@mui/material";
 import debounce from "lodash/debounce";
 import { FiPlus, FiSearch } from "react-icons/fi";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MenuListProps {
   menuData: MenuItem[];
@@ -92,44 +93,65 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
         </Button>
       </div>
       <div className="flex gap-4 relative min-h-screen">
-        <div
+        <motion.div
           className={`w-full ${
             selectedItem && !isMobile ? "w-2/3" : ""
           } grid grid-cols-1 md:grid-cols-2 ${
             !selectedItem ? "xl:grid-cols-3" : ""
           } gap-4 auto-rows-min`}
+          layout
         >
-          {filteredMenu.map((item) => (
-            <MenuCard key={item.id} item={item} handleSelect={handleSelect} />
-          ))}
-        </div>
+          <AnimatePresence>
+            {filteredMenu.map((item) => (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <MenuCard item={item} handleSelect={handleSelect} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
         {!isMobile && selectedItem && (
-          <div className="hidden lg:block w-1/3 sticky top-0 h-screen">
+          <motion.div
+            className="hidden lg:block w-1/3 sticky top-0 h-screen"
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 100 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
             <MenuSidebar
               item={selectedItem}
               onSubmit={handleSubmit}
               setSelectedItem={setSelectedItem}
               isMobile={isMobile}
             />
-          </div>
+          </motion.div>
         )}
       </div>
-      <Drawer
-        anchor="right"
-        open={isMobile && isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-      >
-        <div className="w-full sm:w-96">
-          {selectedItem && (
-            <MenuSidebar
-              item={selectedItem}
-              onSubmit={handleSubmit}
-              setSelectedItem={setSelectedItem}
-              isMobile={isMobile}
-            />
-          )}
-        </div>
-      </Drawer>
+      <AnimatePresence>
+        {isMobile && isDrawerOpen && (
+          <Drawer
+            anchor="right"
+            open={isMobile && isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+          >
+            <div className="w-full sm:w-96">
+              {selectedItem && (
+                <MenuSidebar
+                  item={selectedItem}
+                  onSubmit={handleSubmit}
+                  setSelectedItem={setSelectedItem}
+                  isMobile={isMobile}
+                />
+              )}
+            </div>
+          </Drawer>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

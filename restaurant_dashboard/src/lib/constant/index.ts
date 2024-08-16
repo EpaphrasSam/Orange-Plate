@@ -27,10 +27,10 @@ export const routes: Route[] = [
     path: "/history",
     icon: MdHistory,
   },
-  {
-    name: "Notification",
-    path: "/notifications",
-    icon: MdNotifications,
-  },
+  // {
+  //   name: "Notification",
+  //   path: "/notifications",
+  //   icon: MdNotifications,
+  // },
   { name: "Settings", path: "/settings", icon: MdSettings },
 ];
