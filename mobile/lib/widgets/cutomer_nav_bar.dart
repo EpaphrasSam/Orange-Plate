@@ -8,10 +8,10 @@ class CustomerBottomNavBar extends StatefulWidget {
   const CustomerBottomNavBar({Key? key}) : super(key: key);
 
   @override
-  _MenteeBottomNavBarState createState() => _MenteeBottomNavBarState();
+  _CustomerBottomNavBarState createState() => _CustomerBottomNavBarState();
 }
 
-class _MenteeBottomNavBarState extends State<CustomerBottomNavBar> {
+class _CustomerBottomNavBarState extends State<CustomerBottomNavBar> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
 

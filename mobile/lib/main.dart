@@ -7,6 +7,7 @@ import 'package:mobile/screens/food_details_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
 import 'package:mobile/screens/search_screen.dart';
 import 'package:mobile/widgets/cutomer_nav_bar.dart';
+import 'package:mobile/widgets/delivery_nav_bar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,12 +34,8 @@ class MyApp extends StatelessWidget {
           trackColor: MaterialStateProperty.all<Color>(Colors.black45),
         ),
       ),
-      home: CustomerBottomNavBar(),
-      // home: const SplashScreen(),
-      // home: const ChatScreen(
-      //   mentorEmail: 'tak@gmail.com',
-      // ),
-      // home: const MentorsDisplayScreen(),
+      home: DeliveryBottomNavBar(),
+      // home: CustomerBottomNavBar(),
     );
   }
 }
