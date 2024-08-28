@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/auths/login_screen.dart';
 import 'package:mobile/auths/signup_screen.dart';
+import 'package:mobile/delivery_Screens/available_orders_screen.dart';
+import 'package:mobile/delivery_Screens/delivery_home_screen.dart';
 import 'package:mobile/screens/cart_screen.dart';
 import 'package:mobile/screens/favorite_screen.dart';
 import 'package:mobile/screens/food_details_screen.dart';
@@ -34,8 +36,15 @@ class MyApp extends StatelessWidget {
           trackColor: MaterialStateProperty.all<Color>(Colors.black45),
         ),
       ),
-      home: DeliveryBottomNavBar(),
+      home: DeliveryHomeScreen(),
       // home: CustomerBottomNavBar(),
+      routes: {
+        '/delivery_home': (context) => DeliveryHomeScreen(),
+        '/delivery_orders': (context) => AvailableOrdersScreen(),
+        // '/delivery_earnings': (context) => DeliveryEarningsScreen(),
+        // '/delivery_stats': (context) => DeliveryStatsScreen(),
+        // '/delivery_profile': (context) => DeliveryProfileScreen(),
+      },
     );
   }
 }

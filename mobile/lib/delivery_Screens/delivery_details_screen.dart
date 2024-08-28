@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/functions/back_button_func.dart';
 
 class DeliveryDetailsScreen extends StatelessWidget {
+  final String restaurant;
+  final String customer;
+  // Add other relevant details
+
+  DeliveryDetailsScreen({
+    required this.restaurant,
+    required this.customer,
+    // Add other required parameters
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Handle back button press
-          },
-        ),
-        title: Text('Delivery Details', style: TextStyle(color: Colors.black)),
+        leading: buildBackButton(context),
+        title: const Text('Delivery Details',
+            style: TextStyle(color: Colors.black)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -24,7 +31,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
+                  const Center(
                     child: Column(
                       children: [
                         CircleAvatar(
@@ -42,39 +49,39 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
-                      Icon(Icons.location_pin, color: Colors.orange),
-                      SizedBox(width: 5),
-                      Text('Kumasi, Ghana'),
-                      Spacer(),
+                      const Icon(Icons.location_pin, color: Colors.orange),
+                      const SizedBox(width: 5),
+                      const Text('Kumasi, Ghana'),
+                      const Spacer(),
                       IconButton(
-                        icon: Icon(Icons.phone, color: Colors.green),
+                        icon: const Icon(Icons.phone, color: Colors.green),
                         onPressed: () {
                           // Handle call button press
                         },
                       ),
                     ],
                   ),
-                  Text(
+                  const Text(
                     'Delivery Code: #213344',
                     style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Container(
                     height: 200,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                           'Map Placeholder'), // Replace with your map widget
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Row(
+                  const SizedBox(height: 10),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
@@ -92,7 +99,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       Text('3.2km'),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -101,27 +108,39 @@ class DeliveryDetailsScreen extends StatelessWidget {
                       _buildDetailCard('Payout', '35 cedis'),
                     ],
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {},
-                          child: Text('Cancel Order'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Cancel Order',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {},
-                          child: Text('Accept Order'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green,
-                            padding: EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                          ),
+                          child: const Text(
+                            'Accept Order',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ),
@@ -145,10 +164,11 @@ class DeliveryDetailsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(title, style: TextStyle(color: Colors.grey)),
-            SizedBox(height: 5),
+            Text(title, style: const TextStyle(color: Colors.grey)),
+            const SizedBox(height: 5),
             Text(value,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

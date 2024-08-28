@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class DeliveryMapScreen extends StatelessWidget {
+  const DeliveryMapScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,14 +11,14 @@ class DeliveryMapScreen extends StatelessWidget {
           // Map placeholder
           Container(
             color: Colors.grey[300], // Replace with your map widget
-            child: Center(child: Text('Map Placeholder')),
+            child: const Center(child: Text('Map Placeholder')),
           ),
           // Bottom card
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
@@ -33,7 +35,7 @@ class DeliveryMapScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
+                  const Row(
                     children: [
                       CircleAvatar(
                         backgroundImage: AssetImage(
@@ -53,26 +55,26 @@ class DeliveryMapScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       ElevatedButton(
                         onPressed: () {},
-                        child: Text('End'),
+                        child: const Text('End'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 15),
                         ),
                       ),
                       ElevatedButton.icon(
                         onPressed: () {},
-                        icon: Icon(Icons.phone),
-                        label: Text('Call'),
+                        icon: const Icon(Icons.phone),
+                        label: const Text('Call'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 30, vertical: 15),
                         ),
                       ),

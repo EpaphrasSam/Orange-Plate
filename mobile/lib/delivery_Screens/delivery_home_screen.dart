@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/delivery_Screens/delivery_profile_screen.dart';
+// import 'package:mobile/delivery_Screens/delivery_stats_screen.dart';
+import 'package:mobile/delivery_Screens/delivery_statistics_screen.dart';
+import 'package:mobile/delivery_Screens/earnings_statistics_screen.dart';
 
 class DeliveryHomeScreen extends StatefulWidget {
   const DeliveryHomeScreen({super.key});
@@ -33,7 +37,7 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              const Row(
                 children: [
                   Text(
                     'Hello, Chris👋',
@@ -43,25 +47,25 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                   Icon(Icons.notifications, size: 30),
                 ],
               ),
-              SizedBox(height: 10),
-              Row(
+              const SizedBox(height: 10),
+              const Row(
                 children: [
                   Icon(Icons.location_pin, color: Colors.red),
                   Text('Ayeduase, Kumasi'),
                   Icon(Icons.arrow_drop_down),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Card(
-                color: Colors.orange[100],
+                color: Colors.yellow[300],
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(20),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -78,19 +82,19 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                           ),
                         ],
                       ),
-                      Spacer(), // This Spacer should be removed or replaced
-                      Image.asset('assets/logo.png',
+                      const Spacer(), // This Spacer should be removed or replaced
+                      Image.asset('assets/delivery.png',
                           height: 60), // Replace with your image
                     ],
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics:
-                    NeverScrollableScrollPhysics(), // Added to prevent GridView from scrolling
+                    const NeverScrollableScrollPhysics(), // Added to prevent GridView from scrolling
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
                 children: [
@@ -100,14 +104,15 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                   _buildGridItem(Icons.person, 'Profile'),
                 ],
               ),
-              SizedBox(height: 20), // Added SizedBox to provide spacing
+              const SizedBox(height: 20), // Added SizedBox to provide spacing
               ElevatedButton.icon(
                 onPressed: () {},
-                icon: Icon(Icons.map),
-                label: Text('View Live Map'),
+                icon: const Icon(Icons.map, color: Colors.white),
+                label: const Text('View Live Map',
+                    style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  minimumSize: Size(double.infinity, 50),
+                  minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -123,16 +128,43 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
   Widget _buildGridItem(IconData icon, String label) {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(30),
       ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 40, color: Colors.orange),
-            SizedBox(height: 10),
-            Text(label, style: TextStyle(fontSize: 16)),
-          ],
+      child: InkWell(
+        onTap: () {
+          switch (label) {
+            case 'Orders':
+              Navigator.pushNamed(context, '/delivery_orders');
+              break;
+            case 'Earnings':
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => EarningsStatisticsScreen()),
+              );
+              break;
+            case 'Stats':
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => DeliveryStatsScreen()),
+              );
+              break;
+            case 'Profile':
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => DeliveryProfileScreen()),
+              );
+              break;
+          }
+        },
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 40, color: Colors.orange),
+              const SizedBox(height: 10),
+              Text(label, style: const TextStyle(fontSize: 16)),
+            ],
+          ),
         ),
       ),
     );
