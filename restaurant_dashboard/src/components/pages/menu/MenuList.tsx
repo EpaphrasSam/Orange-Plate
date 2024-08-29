@@ -72,7 +72,7 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between gap-4 items-center">
         <Input
           placeholder="Search menu..."
           value={searchTerm}
@@ -89,7 +89,7 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
           startContent={<FiPlus size={20} />}
           className="bg-[#FCAF01]"
         >
-          Add New Menu
+          <span className="max-sm:hidden">Add New Menu</span>
         </Button>
       </div>
       <div className="flex gap-4 relative min-h-screen">

@@ -41,7 +41,7 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
   return (
     <Card
       className={`${
-        isMobile ? "h-screen" : "h-[calc(100vh-80px)]"
+        isMobile ? "h-screen" : "h-[calc(100vh-80px)] w-96"
       } flex flex-col`}
     >
       <form
