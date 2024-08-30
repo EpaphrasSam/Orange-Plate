@@ -12,3 +12,139 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+//user model
+model User {
+  id        String     @id @default(cuid())
+  name      String
+  email     String     @unique
+  password  String
+  phone     String
+  address   String?
+  createdAt DateTime   @default(now())
+  orders    Order[]
+  reviews   Review[]
+  CartItem  CartItem[]
+}
+
+//restaurant model
+model Restaurant {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  password     String?
+  phone        String
+  address      String
+  latitude     Decimal    @db.Decimal(8, 6)
+  longitude    Decimal    @db.Decimal(9, 6)
+  openingHours DateTime?
+  closingHours DateTime?
+  createdAt    DateTime   @default(now())
+  orders       Order[]
+  menuItems    MenuItem[]
+  reviews      Review[]
+}
+
+//menuItem model
+model MenuItem {
+  id           String     @id @default(cuid())
+  name         String
+  price        Float
+  option       String
+  description  String
+  available    Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  Restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  categoryId   String
+  category     Category   @relation(fields: [categoryId], references: [id])
+  CartItem     CartItem[]
+}
+
+//cart item model
+model CartItem {
+  id         String   @id @default(cuid())
+  quantity   Int
+  MenuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId String
+  User       User     @relation(fields: [userId], references: [id])
+  userId     String
+  orderId    String?
+  Order      Order?   @relation(fields: [orderId], references: [id])
+}
+
+//category model
+model Category {
+  id       String     @id @default(cuid())
+  name     String
+  MenuItem MenuItem[]
+}
+
+//rider model
+model Rider {
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  password       String
+  phone          String
+  vehicle_type   String
+  lincenseNumber String   @unique
+  vehicleNumber  String   @unique
+  availability   Boolean
+  createdAt      DateTime @default(now())
+  orders         Order[]
+}
+
+//order model
+model Order {
+  id           String     @id @default(cuid())
+  status       String     @default("Pending")
+  total        Float
+  orderTime    DateTime   @default(now())
+  deliveryTime DateTime?
+  User         User       @relation(fields: [userId], references: [id])
+  userId       String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  Rider        Rider?     @relation(fields: [riderId], references: [id])
+  riderId      String?
+  // OrderItem    OrderItem[]
+  CartItem     CartItem[]
+  review       Review?
+  Payment      Payment?
+}
+
+//orderItem model
+// model OrderItem {
+//   id       String @id @default(cuid())
+//   quantity Int
+//   price    Float
+//   total    Float
+//   Order    Order  @relation(fields: [orderId], references: [id])
+//   orderId  String
+// }
+
+//review model
+model Review {
+  id           String     @id @default(cuid())
+  rating       Int
+  comment      String
+  createdAt    DateTime   @default(now())
+  User         User       @relation(fields: [userId], references: [id])
+  userId       String
+  order        Order      @relation(fields: [orderId], references: [id])
+  orderId      String     @unique
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String     @unique
+}
+
+//payment model
+model Payment {
+  id            String   @id @default(cuid())
+  paymentMethod String
+  paymentStatus String
+  amount        Float
+  paymentTime   DateTime @default(now())
+  Order         Order    @relation(fields: [orderId], references: [id])
+  orderId       String   @unique
+}
