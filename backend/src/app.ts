@@ -6,13 +6,14 @@ import authRoutes from "./routes/auth";
 import resturantRoutes from "./routes/resturant";
 import adminRoutes from "./routes/admin";
 import userRoutes from "./routes/user";
+import morgan from "morgan";
 
 dotenv.config();
 const app = express();
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
-
+app.use(morgan("dev"));
 app.use("/", index);
 app.use("/authentication", authRoutes);
 app.use("/restaurant", resturantRoutes);
