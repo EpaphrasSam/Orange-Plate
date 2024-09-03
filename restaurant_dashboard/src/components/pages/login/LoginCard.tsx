@@ -9,6 +9,7 @@ import { z } from "zod";
 import { motion } from "framer-motion";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,6 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 const LoginCard = () => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
+  const navigate = useRouter();
 
   const {
     control,
@@ -112,6 +114,7 @@ const LoginCard = () => {
               radius="sm"
               fullWidth
               style={{ backgroundColor: "#FCAF01", color: "white" }}
+              onClick={() => navigate.push("/")}
             >
               Login
             </Button>

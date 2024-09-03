@@ -22,11 +22,11 @@ export const routes: Route[] = [
   { name: "Menu", path: "/menu", icon: MdRestaurantMenu },
   { name: "Delivery", path: "/delivery", icon: MdLocalShipping },
   { name: "Statistics", path: "/statistics", icon: MdInsertChart },
-  {
-    name: "History",
-    path: "/history",
-    icon: MdHistory,
-  },
+  // {
+  //   name: "History",
+  //   path: "/history",
+  //   icon: MdHistory,
+  // },
   // {
   //   name: "Notification",
   //   path: "/notifications",

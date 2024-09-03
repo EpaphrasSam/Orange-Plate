@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { routes } from "@/lib/constant";
 import { Avatar, Divider } from "@nextui-org/react";
@@ -12,6 +12,7 @@ import { Drawer } from "@mui/material";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -83,6 +84,7 @@ const Sidebar = () => {
         } py-6 cursor-pointer text-red-500`}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
+        onClick={() => router.push("/login")}
       >
         <motion.span className="text-2xl">
           <MdLogout />

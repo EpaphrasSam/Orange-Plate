@@ -3,14 +3,10 @@ import Dashboard from "@/components/pages/home/Dashboard";
 // Static data to mimic dashboard content
 const dashboardData = {
   summary: [
-    {
-      title: "Total Revenue (₵)",
-      value: "3,262",
-      icon: "FaMoneyBillWave",
-    },
-    { title: "Total Orders", value: "1,789", icon: "FaShoppingCart" },
-    { title: "Daily Sales", value: "5,678", icon: "FaChartLine" },
-    { title: "Total Income (₵)", value: "7,834", icon: "FaWallet" },
+    { title: "Total Income (₵)", value: "7,834", icon: "FiDollarSign" },
+    { title: "Total Orders", value: "1,789", icon: "FiShoppingCart" },
+    { title: "Daily Sales", value: "5,678", icon: "FiTrendingUp" },
+    { title: "Average Satisfaction", value: "4.5", icon: "FiUsers" },
   ],
   recentOrders: [
     {
@@ -43,10 +39,10 @@ const dashboardData = {
     },
   ],
   topPurchased: [
-    { name: "Burger", quantity: 145, image: "/burger.jpg" },
-    { name: "Pizza", quantity: 132, image: "/burger.jpg" },
-    { name: "Fries", quantity: 113, image: "/burger.jpg" },
-    { name: "Salad", quantity: 92, image: "/burger.jpg" },
+    { name: "Burger", value: 145 },
+    { name: "Pizza", value: 132 },
+    { name: "Fries", value: 113 },
+    { name: "Salad", value: 92 },
   ],
   salesData: [
     { time: "00:00", sales: 400 },
