@@ -90,7 +90,7 @@ model Rider {
   vehicle_type   String
   lincenseNumber String   @unique
   vehicleNumber  String   @unique
-  availability   Boolean
+  availability   Boolean  @default(true)
   createdAt      DateTime @default(now())
   orders         Order[]
 }
