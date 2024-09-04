@@ -33,22 +33,22 @@ export const signUp = async (
   }
 };
 
-//user login controller
+//user/rider login controller
 export const login = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const user: { email: string; password: string } = req.body;
-    await dataValidation.validateUserLoginData(user);
+    const user: { email: string; password: string; role: string } = req.body;
+    await dataValidation.validateLoginData(user);
     const loggedInUser = await authService.login(user);
     const token: string = await jwt.generateToken({
       id: loggedInUser.id,
       name: loggedInUser.name,
     });
     res.status(200).json({
-      message: "User Login successful",
+      message: `${user.role} Login successful`,
       loggedInUser,
       token,
     });
@@ -67,16 +67,21 @@ export const resturantLogin = async (
   next: NextFunction
 ) => {
   try {
-    const resturant: { email: string; password: string } = req.body;
-    await dataValidation.validateUserLoginData(resturant);
-    const loggedInResturant = await authService.resturantLogin(resturant);
+    const restaurant: { email: string; password: string } = req.body;
+    const restaurantData = {
+      email: restaurant.email,
+      password: restaurant.password,
+      role: "restaurant",
+    };
+    await dataValidation.validateLoginData(restaurantData);
+    const loggedInRestaurant = await authService.resturantLogin(restaurantData);
     const token: string = await jwt.generateToken({
-      id: loggedInResturant.id,
-      name: loggedInResturant.name,
+      id: loggedInRestaurant.id,
+      name: loggedInRestaurant.name,
     });
     res.status(200).json({
       message: "Resturant Login successful",
-      loggedInResturant,
+      loggedInRestaurant,
       token,
     });
   } catch (err: any) {

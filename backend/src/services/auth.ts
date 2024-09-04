@@ -17,6 +17,7 @@ interface signUpData {
 interface loginData {
   email: string;
   password: string;
+  role: string;
 }
 
 // user sign up service
@@ -44,27 +45,53 @@ export const signUp = async (userData: signUpData) => {
   }
 };
 
-//user login service
+//user/rider login service
 export const login = async (loginData: loginData) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { email: loginData.email },
-    });
+    const role = loginData.role.toLowerCase();
+    //check if role is customer
+    if (role === "customer") {
+      const user = await prisma.user.findUnique({
+        where: { email: loginData.email },
+      });
 
-    if (!user) {
-      throw new CustomError("User not found", 404);
+      if (!user) {
+        throw new CustomError("Customer not found", 404);
+      }
+      //verify password
+      const isPasswordValid = await bcrypt.verifyPassword(
+        loginData.password,
+        user.password
+      );
+      if (!isPasswordValid) {
+        throw new CustomError("Invalid password: password is not correct", 401);
+      }
+      //return user without password and createdAt
+      const { password, createdAt, ...userData } = user;
+      return userData;
     }
-    //verify password
-    const isPasswordValid = await bcrypt.verifyPassword(
-      loginData.password,
-      user.password
-    );
-    if (!isPasswordValid) {
-      throw new CustomError("Invalid password: password is not correct", 401);
+    //check if role is rider
+    else if (role === "rider") {
+      const rider = await prisma.rider.findUnique({
+        where: { email: loginData.email },
+      });
+      if (!rider) {
+        throw new CustomError("Rider not found", 404);
+      }
+      //verify password
+      const isPasswordValid = await bcrypt.verifyPassword(
+        loginData.password,
+        rider.password
+      );
+      if (!isPasswordValid) {
+        throw new CustomError("Invalid password: password is not correct", 401);
+      }
+      //return rider without password and createdAt
+      const { password, createdAt, ...riderData } = rider;
+      return riderData;
+    } else {
+      throw new CustomError("Invalid role", 401);
     }
-    //return user without password and createdAt
-    const { password, createdAt, ...userData } = user;
-    return userData;
   } catch (err: any) {
     if (err instanceof CustomError) {
       throw err;

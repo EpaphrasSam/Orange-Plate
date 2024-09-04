@@ -144,19 +144,27 @@ export const validateUserSignUpData = async (data: UserSignUpData) => {
   }
 };
 
-export const validateUserLoginData = async (data: {
+export const validateLoginData = async (data: {
   email: string;
   password: string;
+  role: string;
 }) => {
   try {
     const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
     //check if email and password are not empty
-    if (!data.email || !data.password) {
-      throw new CustomError("Email and password are required", 422);
+    if (!data.email || !data.password || !data.role) {
+      throw new CustomError("Email, password and role are required", 422);
     }
     //check if email and password are of type string
-    if (typeof data.email !== "string" || typeof data.password !== "string") {
-      throw new CustomError("Email and password must be of type string", 422);
+    if (
+      typeof data.email !== "string" ||
+      typeof data.password !== "string" ||
+      typeof data.role !== "string"
+    ) {
+      throw new CustomError(
+        "Email, password and role must be of type string",
+        422
+      );
     }
     //check if email is valid
     if (!data.email.match(emailFormat)) {
