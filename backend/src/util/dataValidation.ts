@@ -61,7 +61,7 @@ export const validateCreateRestaurantData = async (data: {
 }) => {
   try {
     const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
-    const phoneFormat = /^(\+233|0)(20|23|24|26|27|28|50|54|55|59)\d{7}$/;
+    const phoneFormat = /^(\+233|0)(20|23|24|26|27|28|50|54|53|55|59)\d{7}$/;
     const { name, email, phone, latitude, longitude } = data;
     //check if name,email,phone,latitude,longitude are not empty
     if (!name || !email || !phone || !latitude || !longitude) {
@@ -95,6 +95,71 @@ export const validateCreateRestaurantData = async (data: {
     //check if longitude is between -180 and 180
     if (longitude < -180 || longitude > 180) {
       throw new CustomError("Longitude must be between -180 and 180", 422);
+    }
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode);
+  }
+};
+
+//create rider data validation
+export const validateCreateRiderData = async (data: {
+  name: string;
+  email: string;
+  phone: string;
+  vehicle_type: string;
+  lincenseNumber: string;
+  vehicleNumber: string;
+}) => {
+  try {
+    const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
+    const phoneFormat = /^(\+233|0)(20|23|24|26|27|28|50|54|53|55|59)\d{7}$/;
+    const { name, email, phone, vehicle_type, lincenseNumber, vehicleNumber } =
+      data;
+    //check if name,email,phone,vehicle_type,lincenseNumber,vehicleNumber are not empty
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !vehicle_type ||
+      !lincenseNumber ||
+      !vehicleNumber
+    ) {
+      throw new CustomError(
+        "name,email,phone,vehicle_type,lincenseNumber,vehicleNumber are required",
+        422
+      );
+    }
+    //check if name,email,phone,vehicle_type,lincenseNumber,vehicleNumber are of type string
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof phone !== "string" ||
+      typeof vehicle_type !== "string" ||
+      typeof lincenseNumber !== "string" ||
+      typeof vehicleNumber !== "string"
+    ) {
+      throw new CustomError(
+        "name,email,phone,vehicle_type,lincenseNumber,vehicleNumber must be of type string",
+        422
+      );
+    }
+    //check if email is valid
+    if (!email.match(emailFormat)) {
+      throw new CustomError("Invalid email address", 422);
+    }
+    //check if phone number is valid
+    if (!phone.match(phoneFormat)) {
+      throw new CustomError("Invalid phone number", 422);
+    }
+    //check if vehicle_type is a valid vehicle type
+    if (
+      vehicle_type.toLowerCase() !== "bike" &&
+      vehicle_type.toLowerCase() !== "car"
+    ) {
+      throw new CustomError(
+        "Invalid vehicle type: Vehicle type should either be bike or car",
+        422
+      );
     }
   } catch (err: any) {
     throw new CustomError(err.message, err.statusCode);

@@ -1,6 +1,7 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import prisma from "../util/prisma"; //import prisma.ts file
 import CustomError from "../util/error";
+import * as bcrypt from "../util/bcrypt";
 
 //create a new restaurant
 export const createRestaurant = async (data: {
@@ -30,6 +31,33 @@ export const createRestaurant = async (data: {
         throw new CustomError("Restaurant already exists", 400);
       }
     }
+    throw new CustomError(err.message, err.statusCode);
+  }
+};
+
+export const createRider = async (data: {
+  name: string;
+  email: string;
+  phone: string;
+  vehicle_type: string;
+  lincenseNumber: string;
+  vehicleNumber: string;
+}) => {
+  try {
+    const hashedPassword = await bcrypt.hashPassword(data.phone);
+    const rider = await prisma.rider.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        vehicle_type: data.vehicle_type,
+        lincenseNumber: data.lincenseNumber,
+        vehicleNumber: data.vehicleNumber,
+        password: hashedPassword,
+      },
+    });
+    return rider;
+  } catch (err: any) {
     throw new CustomError(err.message, err.statusCode);
   }
 };

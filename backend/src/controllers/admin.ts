@@ -30,3 +30,32 @@ export const createRestaurant = async (
     });
   }
 };
+
+//create rider controller
+export const createRider = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const riderData: {
+      name: string;
+      email: string;
+      phone: string;
+      vehicle_type: string;
+      lincenseNumber: string;
+      vehicleNumber: string;
+    } = req.body;
+    await dataValidation.validateCreateRiderData(riderData);
+    const newRider = await adminService.createRider(riderData);
+    res.status(200).json({
+      message: "Rider created successfully",
+      newRider,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
