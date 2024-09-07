@@ -8,43 +8,29 @@ import 'package:mobile/screens/favorite_screen.dart';
 import 'package:mobile/screens/food_details_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
 import 'package:mobile/screens/search_screen.dart';
-import 'package:mobile/widgets/cutomer_nav_bar.dart';
+import 'package:mobile/widgets/customer_nav_bar.dart';
+// import 'package:mobile/widgets/cutomer_nav_bar.dart';
 import 'package:mobile/widgets/delivery_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
-  runApp(
-    const MyApp(),
-  );
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // primarySwatch: createMaterialColor(tPABrandColor),
-        // The global font for the app (To over write the particular font is used at the place needed)
-        fontFamily: 'EBEXTRABOLD',
-
-        scrollbarTheme: ScrollbarThemeData(
-          thumbColor: MaterialStateProperty.all<Color>(Colors.black45),
-          trackColor: MaterialStateProperty.all<Color>(Colors.black45),
-        ),
-      ),
-      home: DeliveryHomeScreen(),
-      // home: CustomerBottomNavBar(),
-      routes: {
-        '/delivery_home': (context) => DeliveryHomeScreen(),
-        '/delivery_orders': (context) => AvailableOrdersScreen(),
-        // '/delivery_earnings': (context) => DeliveryEarningsScreen(),
-        // '/delivery_stats': (context) => DeliveryStatsScreen(),
-        // '/delivery_profile': (context) => DeliveryProfileScreen(),
-      },
+      home: isLoggedIn ? CustomerBottomNavBar() : OrangePlateLogin(),
     );
   }
 }

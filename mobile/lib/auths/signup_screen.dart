@@ -1,13 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:mobile/auths/login_screen.dart';
+import 'package:mobile/services/endpoints.dart'; // Import endpoints
+import 'package:http/http.dart' as http;
+import 'package:mobile/widgets/customer_nav_bar.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class OrangePlateSignUp extends StatelessWidget {
-  final TextEditingController controller = TextEditingController();
-  final PhoneNumber initialNumber = PhoneNumber(isoCode: 'GH');
+class OrangePlateSignUp extends StatefulWidget {
+  OrangePlateSignUp({super.key});
+
+  @override
+  State<OrangePlateSignUp> createState() => _OrangePlateSignUpState();
+}
+
+class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
+  final TextEditingController emailController = TextEditingController();
+
+  final TextEditingController passwordController = TextEditingController();
+
+  final TextEditingController nameController = TextEditingController();
+
+  final TextEditingController phoneController = TextEditingController();
+
+  bool _passwordVisible = false;
+  bool _isLoading = false;
+
+  void registerUser(BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      var response = await http.post(
+        Uri.parse(signupUrl),
+        body: jsonEncode({
+          'email': emailController.text,
+          'password': passwordController.text,
+          'name': nameController.text,
+          'phone': phoneController.text,
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString(
+            'userId', data['newUser']['id']); // Store the user ID
+        await prefs.setString('userToken', data['token']); // Store the token
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CustomerBottomNavBar()),
+        );
+      } else {
+        var errorData = jsonDecode(response.body);
+        throw Exception(errorData['error']
+            ['message']); // Use the specific error message from the response
+      }
+    } catch (e) {
+      print(e.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Define initialNumber with a default value
+    PhoneNumber initialNumber = PhoneNumber(isoCode: 'GH');
+
     return Scaffold(
       body: Stack(
         children: [
@@ -51,27 +119,42 @@ class OrangePlateSignUp extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     // Full Name TextField
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
                         labelText: 'Full name',
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 10),
                     // Email TextField
-                    const TextField(
-                      decoration: InputDecoration(
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 10),
                     // Password TextField
-                    const TextField(
-                      obscureText: true,
+                    TextField(
+                      controller: passwordController,
+                      obscureText: !_passwordVisible,
                       decoration: InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -101,7 +184,7 @@ class OrangePlateSignUp extends StatelessWidget {
                               selectorTextStyle:
                                   const TextStyle(color: Colors.black),
                               initialValue: initialNumber,
-                              textFieldController: controller,
+                              textFieldController: phoneController,
                               formatInput: false,
                               keyboardType:
                                   const TextInputType.numberWithOptions(
@@ -122,9 +205,8 @@ class OrangePlateSignUp extends StatelessWidget {
 
                     // Register Button
                     ElevatedButton(
-                      onPressed: () {
-                        // TODO: handle the register logic here
-                      },
+                      onPressed: () => registerUser(
+                          context), // Use the registerUser function with context
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(

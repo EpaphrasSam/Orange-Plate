@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-class FavouriteScreen extends StatelessWidget {
+class FavouriteScreen extends StatefulWidget {
+  const FavouriteScreen({super.key});
+
+  @override
+  State<FavouriteScreen> createState() => _FavouriteScreenState();
+}
+
+class _FavouriteScreenState extends State<FavouriteScreen> {
   final List<Product> favoriteProducts = [
     Product(
       imageUrl: 'assets/img1.png',
@@ -59,7 +66,6 @@ class FavouriteScreen extends StatelessWidget {
           return FavouriteProductCard(product: favoriteProducts[index]);
         },
       ),
-     
     );
   }
 }
@@ -81,7 +87,7 @@ class Product {
 class FavouriteProductCard extends StatelessWidget {
   final Product product;
 
-  const FavouriteProductCard({required this.product});
+  const FavouriteProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +107,8 @@ class FavouriteProductCard extends StatelessWidget {
                 children: [
                   // Product Image with rounded corners
                   ClipRRect(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(10)),
                     child: Image.asset(
                       product.imageUrl,
                       width: double.infinity,
@@ -155,7 +162,8 @@ class FavouriteProductCard extends StatelessWidget {
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),

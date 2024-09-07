@@ -1,17 +1,144 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/functions/logout_func.dart';
+import 'package:mobile/models/models.dart';
+import 'package:mobile/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<ProductModel> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationServicesAndFetchProducts(); // Check location services and fetch products
+    printStoredUserData(); // Print stored user data
+  }
+
+  void _checkLocationServicesAndFetchProducts() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showLocationServicesDialog();
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        _showLocationPermissionDialog();
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showLocationPermissionDialog();
+      return;
+    }
+
+    fetchProducts(); // Fetch products when location services are enabled and permissions are granted
+  }
+
+  void _showLocationServicesDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Services Disabled'),
+          content: const Text(
+              'Please enable location services to use this feature.'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Geolocator.openLocationSettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showLocationPermissionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Permission Denied'),
+          content: const Text(
+              'Please grant location permission to use this feature.'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Geolocator.openAppSettings();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void fetchProducts() async {
+    Position position = await _determinePosition();
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+
+    print('Coordinates: Latitude = $latitude, Longitude = $longitude');
+
+    try {
+      var fetchedProducts =
+          await ApiService().fetchProducts(latitude, longitude);
+      print(
+          'Response body: $fetchedProducts'); // Print the response body for debugging
+
+      if (fetchedProducts is List<dynamic>) {
+        setState(() {
+          products = fetchedProducts
+              .map(
+                  (item) => ProductModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+        });
+      } else {
+        print('Error: fetched products are not of type List<dynamic>');
+      }
+    } catch (e) {
+      print('Failed to fetch products: $e');
+    }
+  }
+
+  Future<Position> _determinePosition() async {
+    return await Geolocator.getCurrentPosition();
+  }
+
+  void printStoredUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? storedUserId = prefs.getString('userId');
+    String? storedUserToken = prefs.getString('userToken');
+    print('Stored User ID: $storedUserId');
+    print('Stored User Token: $storedUserToken');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
           child: CircleAvatar(
             backgroundImage: AssetImage('assets/man.jpg'),
           ),
         ),
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Hello, Chris!'),
@@ -19,8 +146,14 @@ class HomePage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () {
+              logout(context); // Call the logout function
+            },
           ),
         ],
         backgroundColor: Colors.white,
@@ -34,11 +167,11 @@ class HomePage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: Container(
-                margin: EdgeInsets.all(16.0),
+                margin: const EdgeInsets.all(16.0),
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
-                  image: DecorationImage(
+                  image: const DecorationImage(
                     image: AssetImage(
                         'assets/burger.jpg'), // Replace with your image
                     fit: BoxFit.cover, // Changed to cover for a better fit
@@ -48,8 +181,8 @@ class HomePage extends StatelessWidget {
             ),
 
             // Categories
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -66,14 +199,15 @@ class HomePage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Cuisines',
+                  const Text('Cuisines',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   GridView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.75, // Adjusted for better fit
                       crossAxisSpacing: 10,
@@ -84,17 +218,18 @@ class HomePage extends StatelessWidget {
                       return CuisineCard(cuisine: cuisines[index]);
                     },
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
-                  Text('Restaurants',
+                  const Text('Restaurants',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   GridView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.75, // Adjusted for better fit
                       crossAxisSpacing: 10,
@@ -103,6 +238,34 @@ class HomePage extends StatelessWidget {
                     itemCount: restaurants.length,
                     itemBuilder: (context, index) {
                       return RestaurantCard(restaurant: restaurants[index]);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            // Products Section
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Products',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                  const SizedBox(height: 8),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.75,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      return ProductCard(product: products[index]);
                     },
                   ),
                 ],
@@ -135,9 +298,9 @@ class CategoryIcon extends StatelessWidget {
           ),
           child: Icon(icon, size: 32, color: Colors.orange),
         ),
-        SizedBox(height: 4),
+        const SizedBox(height: 4),
         Text(label,
-            style: TextStyle(fontWeight: FontWeight.bold)), // Label text
+            style: const TextStyle(fontWeight: FontWeight.bold)), // Label text
       ],
     );
   }
@@ -173,10 +336,10 @@ class CuisineCard extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           cuisine.name,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.bold, fontSize: 16), // Cuisine name text
         ),
       ],
@@ -201,8 +364,6 @@ final cuisines = [
   Cuisine(name: 'Burger', imagePath: 'assets/burger.jpg', isFavorite: true),
   // Add more cuisines as required
 ];
-
-// import 'package:flutter/material.dart';
 
 class RestaurantCard extends StatelessWidget {
   final Restaurant restaurant;
@@ -234,16 +395,12 @@ class RestaurantCard extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         Text(
           restaurant.name,
-          style: TextStyle(
+          style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16), // Restaurant name text
-        ),
-        Text(
-          restaurant.location,
-          style: TextStyle(color: Colors.grey[600]), // Location text
         ),
       ],
     );
@@ -252,37 +409,91 @@ class RestaurantCard extends StatelessWidget {
 
 class Restaurant {
   final String name;
-  final String location;
   final String imagePath;
   final bool isFavorite;
 
   Restaurant(
-      {required this.name,
-      required this.location,
-      required this.imagePath,
-      this.isFavorite = false});
+      {required this.name, required this.imagePath, this.isFavorite = false});
 }
 
 final restaurants = [
   Restaurant(
-      name: 'The Grill House',
-      location: '123 Food Street',
-      imagePath: 'assets/restaurant2.jpg',
-      isFavorite: true),
+      name: 'Restaurant 1', imagePath: 'assets/ham.png', isFavorite: true),
   Restaurant(
-      name: 'Sushi Palace',
-      location: '456 Sushi Avenue',
-      imagePath: 'assets/restaurant1.jpg',
-      isFavorite: false),
+      name: 'Restaurant 2', imagePath: 'assets/burger.jpg', isFavorite: true),
   Restaurant(
-      name: 'Pasta Paradise',
-      location: '789 Italian Road',
-      imagePath: 'assets/restaurant1.jpg',
-      isFavorite: true),
+      name: 'Restaurant 3', imagePath: 'assets/ham.png', isFavorite: true),
   Restaurant(
-      name: 'Burger World',
-      location: '101 Burger Lane',
-      imagePath: 'assets/restaurant2.jpg',
-      isFavorite: true),
+      name: 'Restaurant 4', imagePath: 'assets/burger.jpg', isFavorite: true),
   // Add more restaurants as required
+];
+
+class ProductCard extends StatelessWidget {
+  final ProductModel product;
+
+  const ProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.0),
+              image: DecorationImage(
+                image: AssetImage(product.imagePath),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.favorite,
+                  color: product.isFavorite ? Colors.red : Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          product.name,
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontSize: 16), // Product name text
+        ),
+      ],
+    );
+  }
+}
+
+class ProductModel {
+  final String name;
+  final String imagePath;
+  final bool isFavorite;
+
+  ProductModel(
+      {required this.name, required this.imagePath, this.isFavorite = false});
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      name: json['name'],
+      imagePath: json['imagePath'],
+      isFavorite: json['isFavorite'] ?? false,
+    );
+  }
+}
+
+final products = [
+  ProductModel(
+      name: 'Product 1', imagePath: 'assets/ham.png', isFavorite: true),
+  ProductModel(
+      name: 'Product 2', imagePath: 'assets/burger.jpg', isFavorite: true),
+  ProductModel(
+      name: 'Product 3', imagePath: 'assets/ham.png', isFavorite: true),
+  ProductModel(
+      name: 'Product 4', imagePath: 'assets/burger.jpg', isFavorite: true),
+  // Add more products as required
 ];

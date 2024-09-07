@@ -10,6 +10,8 @@ class ProductDetailScreen extends StatelessWidget {
   final String serving = '1-2 person';
   final String price = '₵25.00';
 
+  const ProductDetailScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
