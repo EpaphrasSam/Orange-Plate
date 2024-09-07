@@ -56,16 +56,20 @@ export const validateCreateRestaurantData = async (data: {
   name: string;
   email: string;
   phone: string;
+  address: string;
   latitude: number;
   longitude: number;
 }) => {
   try {
     const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
     const phoneFormat = /^(\+233|0)(20|23|24|26|27|28|50|54|53|55|59)\d{7}$/;
-    const { name, email, phone, latitude, longitude } = data;
+    const { name, email, phone, latitude, longitude, address } = data;
     //check if name,email,phone,latitude,longitude are not empty
-    if (!name || !email || !phone || !latitude || !longitude) {
-      throw new CustomError("All fields are required", 422);
+    if (!name || !email || !phone || !latitude || !longitude || !address) {
+      throw new CustomError(
+        "name,email,phone,latitude,longitude,address are required",
+        422
+      );
     }
     //check if email is valid
     if (!email.match(emailFormat)) {
@@ -75,16 +79,17 @@ export const validateCreateRestaurantData = async (data: {
     if (!phone.match(phoneFormat)) {
       throw new CustomError("Invalid phone number", 422);
     }
-    //check if name,email,phone are of type sring and latitude,longitude are of type number
+    //check if name,email,phone,address are of type sring and latitude,longitude are of type number
     if (
       typeof name !== "string" ||
       typeof email !== "string" ||
       typeof phone !== "string" ||
       typeof latitude !== "number" ||
-      typeof longitude !== "number"
+      typeof longitude !== "number" ||
+      typeof address !== "string"
     ) {
       throw new CustomError(
-        "name,email,phone are of type sring must be of type string and latitude,longitude must be of type float",
+        "name,email,phone,address are of type string and latitude,longitude must be of type float",
         422
       );
     }

@@ -4,6 +4,31 @@ import CustomError from "../util/error";
 import * as bcrypt from "../util/bcrypt";
 import * as jwt from "../util/jwt";
 
+//update restaurant
+export const updateRestaurant = async (
+  restaurantData: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+  },
+  restaurantId: string
+) => {
+  try {
+    const updatedRestaurant = await prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: restaurantData,
+    });
+    return updatedRestaurant;
+  } catch (err: any) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      throw new CustomError(`Prisma error '${err.code}' occured`, 500);
+    }
+    throw new CustomError(err.message, 500);
+  }
+};
 //create category
 export const createCategory = async (categoryData: { name: string }[]) => {
   try {

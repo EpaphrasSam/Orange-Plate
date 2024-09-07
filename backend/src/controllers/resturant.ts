@@ -29,6 +29,41 @@ export const createPassword = async (
   }
 };
 
+//update restaurant
+export const updateRestaurant = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const restaurantId: string = req.params.id;
+    const token: any = req.headers.authorization;
+    const restaurantData: {
+      name: string;
+      email: string;
+      phone: string;
+      address: string;
+      latitude: number;
+      longitude: number;
+    } = req.body;
+    await jwt.verifyToken(token);
+    await dataValidation.validateCreateRestaurantData(restaurantData);
+    const updatedRestaurant = await resturantService.updateRestaurant(
+      restaurantData,
+      restaurantId
+    );
+    res.status(200).json({
+      status: "Restaurant updated successfully",
+      updatedRestaurant,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
+
 //create category
 export const createCategory = async (
   req: Request,
