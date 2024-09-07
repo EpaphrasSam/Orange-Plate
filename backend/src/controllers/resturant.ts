@@ -3,6 +3,7 @@ import CustomError from "../util/error";
 import * as dataValidation from "../util/dataValidation";
 import * as resturantService from "../services/resturant";
 import * as jwt from "../util/jwt";
+import * as notification from "../util/notification";
 
 //create password
 export const createPassword = async (
@@ -248,6 +249,11 @@ export const updateOrderStatus = async (
     const updatedOrder = await resturantService.updateOrderStatus(
       orderId,
       user.id
+    );
+    await notification.sendOrderStatusNotification(
+      updatedOrder.userId,
+      updatedOrder.id,
+      updatedOrder.status
     );
     res.status(200).json({
       status: "Order status updated successfully",
