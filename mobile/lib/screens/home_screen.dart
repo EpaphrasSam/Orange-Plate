@@ -1,9 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile/constants/file_path.dart';
 import 'package:mobile/functions/logout_func.dart';
+import 'package:mobile/models/models.dart';
+import 'package:mobile/models/models.dart';
 import 'package:mobile/models/models.dart';
 import 'package:mobile/services/api_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mobile/services/endpoints.dart'; // Import endpoints
+import 'dart:convert'; // Import JSON codec
+import 'package:http/http.dart' as http; // Import HTTP package
+import 'package:mobile/screens/product_details_screen.dart';
+import 'package:mobile/models/favorite_model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<ProductModel> products = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -89,30 +99,90 @@ class _HomePageState extends State<HomePage> {
   }
 
   void fetchProducts() async {
+    setState(() {
+      isLoading = true;
+    });
+
     Position position = await _determinePosition();
     double latitude = position.latitude;
     double longitude = position.longitude;
 
     print('Coordinates: Latitude = $latitude, Longitude = $longitude');
 
-    try {
-      var fetchedProducts =
-          await ApiService().fetchProducts(latitude, longitude);
-      print(
-          'Response body: $fetchedProducts'); // Print the response body for debugging
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('userToken');
 
-      if (fetchedProducts is List<dynamic>) {
-        setState(() {
-          products = fetchedProducts
-              .map(
-                  (item) => ProductModel.fromJson(item as Map<String, dynamic>))
-              .toList();
-        });
+    if (token == null) {
+      print('Error: No token found');
+      return;
+    }
+
+    print('Retrieved Token: $token');
+
+    try {
+      var response = await http.post(
+        Uri.parse(getNearbyRestaurantsMenuItemsUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: jsonEncode({
+          'latitude': latitude,
+          'longitude': longitude,
+        }),
+      );
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        print('Response data: $responseData');
+
+        if (responseData != null && responseData['menuItems'] is List) {
+          List<dynamic> menuItems = responseData['menuItems'];
+          List<ProductModel> fetchedProducts = [];
+
+          for (var restaurantMenu in menuItems) {
+            if (restaurantMenu is List) {
+              for (var item in restaurantMenu) {
+                if (item is Map<String, dynamic>) {
+                  try {
+                    fetchedProducts.add(ProductModel.fromJson(item));
+                  } catch (e) {
+                    print('Error parsing product: $e');
+                    print('Problematic item: $item');
+                  }
+                } else {
+                  print('Unexpected item type: ${item.runtimeType}');
+                }
+              }
+            } else {
+              print(
+                  'Unexpected restaurant menu type: ${restaurantMenu.runtimeType}');
+            }
+          }
+
+          setState(() {
+            products = fetchedProducts;
+            print('Number of products: ${products.length}');
+            print(
+                'First product: ${products.isNotEmpty ? products.first : "No products"}');
+          });
+        } else {
+          print('Error: menuItems are not of type List');
+          print('menuItems type: ${responseData['menuItems'].runtimeType}');
+        }
       } else {
-        print('Error: fetched products are not of type List<dynamic>');
+        print(
+            'Failed to fetch products with status code ${response.statusCode}');
       }
     } catch (e) {
       print('Failed to fetch products: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -194,55 +264,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             // Cuisines Section
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Cuisines',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  const SizedBox(height: 8),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75, // Adjusted for better fit
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemCount: cuisines.length,
-                    itemBuilder: (context, index) {
-                      return CuisineCard(cuisine: cuisines[index]);
-                    },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text('Restaurants',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-                  const SizedBox(height: 8),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75, // Adjusted for better fit
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                    ),
-                    itemCount: restaurants.length,
-                    itemBuilder: (context, index) {
-                      return RestaurantCard(restaurant: restaurants[index]);
-                    },
-                  ),
-                ],
-              ),
-            ),
+            // Removed Cuisines Section
+
             // Products Section
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -253,21 +276,26 @@ class _HomePageState extends State<HomePage> {
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                   const SizedBox(height: 8),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 0.75,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                  if (isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (products.isEmpty)
+                    const Center(child: Text('No products available'))
+                  else
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.7, // Adjusted for better fit
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: products.length,
+                      itemBuilder: (context, index) {
+                        return ProductCard(product: products[index]);
+                      },
                     ),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      return ProductCard(product: products[index]);
-                    },
-                  ),
                 ],
               ),
             ),
@@ -306,194 +334,201 @@ class CategoryIcon extends StatelessWidget {
   }
 }
 
-class CuisineCard extends StatelessWidget {
-  final Cuisine cuisine;
-
-  const CuisineCard({required this.cuisine});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              image: DecorationImage(
-                image: AssetImage(cuisine.imagePath),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.favorite,
-                  color: cuisine.isFavorite ? Colors.red : Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          cuisine.name,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 16), // Cuisine name text
-        ),
-      ],
-    );
-  }
-}
-
-class Cuisine {
-  final String name;
-  final String imagePath;
-  final bool isFavorite;
-
-  Cuisine(
-      {required this.name, required this.imagePath, this.isFavorite = false});
-}
-
-final cuisines = [
-  Cuisine(name: 'Fried Rice', imagePath: 'assets/ham.png', isFavorite: true),
-  Cuisine(
-      name: 'Jollof Rice', imagePath: 'assets/burger.jpg', isFavorite: true),
-  Cuisine(name: 'Pizza', imagePath: 'assets/ham.png', isFavorite: true),
-  Cuisine(name: 'Burger', imagePath: 'assets/burger.jpg', isFavorite: true),
-  // Add more cuisines as required
-];
-
-class RestaurantCard extends StatelessWidget {
-  final Restaurant restaurant;
-
-  const RestaurantCard({required this.restaurant});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              image: DecorationImage(
-                image: AssetImage(restaurant.imagePath),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.favorite,
-                  color: restaurant.isFavorite ? Colors.red : Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          restaurant.name,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16), // Restaurant name text
-        ),
-      ],
-    );
-  }
-}
-
-class Restaurant {
-  final String name;
-  final String imagePath;
-  final bool isFavorite;
-
-  Restaurant(
-      {required this.name, required this.imagePath, this.isFavorite = false});
-}
-
-final restaurants = [
-  Restaurant(
-      name: 'Restaurant 1', imagePath: 'assets/ham.png', isFavorite: true),
-  Restaurant(
-      name: 'Restaurant 2', imagePath: 'assets/burger.jpg', isFavorite: true),
-  Restaurant(
-      name: 'Restaurant 3', imagePath: 'assets/ham.png', isFavorite: true),
-  Restaurant(
-      name: 'Restaurant 4', imagePath: 'assets/burger.jpg', isFavorite: true),
-  // Add more restaurants as required
-];
-
-class ProductCard extends StatelessWidget {
+class ProductCard extends StatefulWidget {
   final ProductModel product;
 
   const ProductCard({required this.product});
 
   @override
+  _ProductCardState createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  bool _isFavorite = false;
+  late FavoriteList favoriteList;
+
+  @override
+  void initState() {
+    super.initState();
+    favoriteList = FavoriteList(items: []); // Initialize with an empty list
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favoritesJson = prefs.getString('favorites') ?? '[]';
+    favoriteList = FavoriteList.fromJson(favoritesJson);
+    setState(() {
+      _isFavorite = favoriteList.contains(widget.product.id);
+    });
+  }
+
+  Future<void> _toggleFavorite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favoritesJson = prefs.getString('favorites') ?? '[]';
+    final favoriteList = FavoriteList.fromJson(favoritesJson);
+
+    setState(() {
+      if (_isFavorite) {
+        favoriteList.removeItem(widget.product.id);
+      } else {
+        favoriteList.addItem(FavoriteItem(
+          id: widget.product.id,
+          menuItem: MenuItem(
+            id: widget.product.id,
+            name: widget.product.name,
+            price: widget.product.price,
+            option: widget.product.imagePath,
+            description: widget.product.description,
+            available: true,
+            createdAt: DateTime.now().toIso8601String(),
+            restaurantId: '',
+            categoryId: '',
+          ),
+        ));
+      }
+      _isFavorite = !_isFavorite;
+    });
+
+    await prefs.setString('favorites', favoriteList.toJson());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.0),
-              image: DecorationImage(
-                image: AssetImage(product.imagePath),
-                fit: BoxFit.cover,
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Stack(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          ProductDetailsScreen(product: widget.product),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: CachedNetworkImage(
+                    cacheKey: widget.product.imagePath,
+                    imageUrl: widget.product.imagePath,
+                    placeholder: (context, url) => Image.asset(placeHolderPath),
+                    errorWidget: (context, url, error) =>
+                        Image.asset(placeHolderPath),
+                    fit: BoxFit.cover,
+                    height: 120,
+                    width: double.infinity,
+                  ),
+                ),
               ),
-            ),
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.favorite,
-                  color: product.isFavorite ? Colors.red : Colors.white,
+              Positioned(
+                top: 8,
+                right: 8,
+                child: GestureDetector(
+                  onTap: _toggleFavorite,
+                  child: Icon(
+                    _isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: _isFavorite ? Colors.red : Colors.grey,
+                    size: 28,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetailsScreen(product: widget.product)),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.product.name.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '\GH₵${widget.product.price.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          product.name,
-          style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: 16), // Product name text
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class ProductModel {
-  final String name;
-  final String imagePath;
-  final bool isFavorite;
+// class ProductModel {
+//   final String id;
+//   final String name;
+//   final double price;
+//   final String option;
+//   final String description;
+//   final bool available;
+//   final String createdAt;
+//   final String restaurantId;
+//   final String categoryId;
+//   final String imagePath;
+//   final bool isFavorite;
 
-  ProductModel(
-      {required this.name, required this.imagePath, this.isFavorite = false});
+//   ProductModel({
+//     required this.id,
+//     required this.name,
+//     required this.price,
+//     required this.option,
+//     required this.description,
+//     required this.available,
+//     required this.createdAt,
+//     required this.restaurantId,
+//     required this.categoryId,
+//     required this.imagePath,
+//     required this.isFavorite,
+//   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    return ProductModel(
-      name: json['name'],
-      imagePath: json['imagePath'],
-      isFavorite: json['isFavorite'] ?? false,
-    );
-  }
-}
+//   factory ProductModel.fromJson(Map<String, dynamic> json) {
+//     return ProductModel(
+//       id: json['id'] as String? ?? '',
+//       name: json['name'] as String? ?? '',
+//       price: (json['price'] as num?)?.toDouble() ?? 0.0,
+//       option: json['option'] as String? ?? '',
+//       description: json['description'] as String? ?? '',
+//       available: json['available'] as bool? ?? false,
+//       createdAt: json['createdAt'] as String? ?? '',
+//       restaurantId: json['restaurantId'] as String? ?? '',
+//       categoryId: json['categoryId'] as String? ?? '',
+//       imagePath: json['imagePath'] as String? ?? 'assets/default_image.png',
+//       isFavorite: json['isFavorite'] as bool? ?? false,
+//     );
+//   }
+// }
 
-final products = [
-  ProductModel(
-      name: 'Product 1', imagePath: 'assets/ham.png', isFavorite: true),
-  ProductModel(
-      name: 'Product 2', imagePath: 'assets/burger.jpg', isFavorite: true),
-  ProductModel(
-      name: 'Product 3', imagePath: 'assets/ham.png', isFavorite: true),
-  ProductModel(
-      name: 'Product 4', imagePath: 'assets/burger.jpg', isFavorite: true),
-  // Add more products as required
-];
+final products = []; // Removed hardcoded products
