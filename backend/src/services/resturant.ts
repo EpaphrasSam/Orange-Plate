@@ -1,8 +1,14 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import prisma from "../util/prisma"; //import prisma.ts file
+import {
+  Decimal,
+  PrismaClientKnownRequestError,
+} from "@prisma/client/runtime/library";
+import prisma from "../util/prisma"; //
+import { Prisma } from "@prisma/client"; //import prisma.ts file
 import CustomError from "../util/error";
 import * as bcrypt from "../util/bcrypt";
 import * as jwt from "../util/jwt";
+import { point, distance } from "@turf/turf";
+import * as notification from "../util/notification";
 
 //update restaurant
 export const updateRestaurant = async (
@@ -240,9 +246,10 @@ export const updateOrderStatus = async (
     if (order.status === "ready") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
-        data: { status: "on the way" },
+        data: { status: "looking for rider" },
         include: {
           User: true,
+          restaurant: true,
           CartItem: {
             include: {
               MenuItem: true,
@@ -250,6 +257,26 @@ export const updateOrderStatus = async (
           },
         },
       });
+      //find the restaurant
+      const restaurant = await prisma.restaurant.findUnique({
+        where: { id: order.restaurantId },
+      });
+      //send notification to riders
+      const restaurantLocation: {
+        latitude: number;
+        longitude: number;
+      } = {
+        latitude: restaurant?.latitude
+          ? new Prisma.Decimal(restaurant.latitude).toNumber()
+          : 0,
+        longitude: restaurant?.longitude
+          ? new Prisma.Decimal(restaurant.longitude).toNumber()
+          : 0,
+      };
+      await notification.sendRiderPickUpNotification(
+        restaurantLocation,
+        updatedOrder
+      );
       return updatedOrder;
     }
     //if order status == on the way
@@ -277,6 +304,47 @@ export const updateOrderStatus = async (
     if (err instanceof PrismaClientKnownRequestError) {
       throw new CustomError(`Prisma error '${err.code}' occured`, 500);
     }
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
+
+//get riders near restaurant
+export const ridersCloseBy = async (restaurantLocation: {
+  latitude: number;
+  longitude: number;
+}) => {
+  try {
+    const riders = await prisma.rider.findMany({
+      where: {
+        latitude: {
+          gte: restaurantLocation.latitude - 0.05,
+          lte: restaurantLocation.latitude + 0.05,
+        },
+        longitude: {
+          gte: restaurantLocation.longitude - 0.05,
+          lte: restaurantLocation.longitude + 0.05,
+        },
+      },
+    });
+
+    const restaurantPoint = point([
+      restaurantLocation.longitude,
+      restaurantLocation.latitude,
+    ]);
+    // Filter riders within a 5km radius
+    const filteredRiders = riders.filter((rider) => {
+      const riderPoint = point([
+        Number(rider.longitude),
+        Number(rider.latitude),
+      ]);
+      const distanceInKm = distance(restaurantPoint, riderPoint, {
+        units: "kilometers",
+      });
+      return distanceInKm <= 5;
+    });
+    return filteredRiders;
+  } catch (err: any) {
+    console.log(err);
     throw new CustomError(err.message, err.statusCode || 500);
   }
 };
