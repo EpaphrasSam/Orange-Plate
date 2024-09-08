@@ -50,3 +50,36 @@ export const getRider = async (riderId: string) => {
     throw new CustomError(err.message, err.statusCode || 400);
   }
 };
+
+//accept order
+export const acceptOrder = async (riderId: string, orderId: string) => {
+  try {
+    const order = await prisma.order.update({
+      where: {
+        id: orderId,
+        riderId: null,
+        status: "looking for rider",
+      },
+      data: {
+        riderId: riderId,
+        status: "rider assigned",
+      },
+      include: {
+        Rider: true,
+        restaurant: true,
+        User: true,
+        CartItem: {
+          include: {
+            MenuItem: true,
+          },
+        },
+      },
+    });
+    if (!order) {
+      throw new CustomError("Order not found", 404);
+    }
+    return order;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 400);
+  }
+};
