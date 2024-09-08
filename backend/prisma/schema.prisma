@@ -93,6 +93,8 @@ model Rider {
   availability   Boolean  @default(true)
   createdAt      DateTime @default(now())
   orders         Order[]
+  latitude       Decimal? @db.Decimal(8, 6)
+  longitude      Decimal? @db.Decimal(9, 6)
 }
 
 //order model

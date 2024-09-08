@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth";
 import resturantRoutes from "./routes/resturant";
 import adminRoutes from "./routes/admin";
 import userRoutes from "./routes/user";
+import riderRoutes from "./routes/rider";
 import morgan from "morgan";
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.use("/authentication", authRoutes);
 app.use("/restaurant", resturantRoutes);
 app.use("/admin", adminRoutes);
 app.use("/user", userRoutes);
+app.use("/rider", riderRoutes);
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(err.status || 500).json({ error: err });
 });
