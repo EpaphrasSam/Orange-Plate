@@ -167,15 +167,31 @@ export const placeOrder = async (
       total,
       restaurantId,
       cartItems,
-    }: { total: number; restaurantId: string; cartItems: string[] } = req.body;
+      customerLatitude,
+      customerLongitude,
+    }: {
+      total: number;
+      restaurantId: string;
+      customerLatitude: number;
+      customerLongitude: number;
+      cartItems: string[];
+    } = req.body;
     const token: any = req.headers.authorization;
     await jwt.verifyToken(token);
-    await dataValidation.validatePlaceOrderData(total, restaurantId, cartItems);
+    await dataValidation.validatePlaceOrderData(
+      total,
+      restaurantId,
+      cartItems,
+      customerLatitude,
+      customerLongitude
+    );
     const order = await userService.placeOrder(
       userId,
       total,
       restaurantId,
-      cartItems
+      cartItems,
+      customerLatitude,
+      customerLongitude
     );
     res.status(200).json({
       message: "Order placed successfully",

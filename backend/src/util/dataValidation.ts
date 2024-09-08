@@ -485,7 +485,9 @@ export const validateEditCartItemData = async (quantity: number) => {
 export const validatePlaceOrderData = async (
   total: number,
   restaurantId: string,
-  cartItems: string[]
+  cartItems: string[],
+  latitude: number,
+  longitude: number
 ) => {
   try {
     //check if cartItems is an array
@@ -502,6 +504,17 @@ export const validatePlaceOrderData = async (
         throw new CustomError("Cart items must be an array of strings", 422);
       }
     });
+    // check if latitude and longitude are not empty
+    if (!latitude || !longitude) {
+      throw new CustomError("Latitude and longitude are required", 422);
+    }
+    //check if latitude and longitude are of type number
+    if (typeof latitude !== "number" || typeof longitude !== "number") {
+      throw new CustomError(
+        "Latitude and longitude must be of type number",
+        422
+      );
+    }
     //check if total is of type number
     if (typeof total !== "number") {
       throw new CustomError("Total must be of type number", 422);

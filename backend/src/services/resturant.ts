@@ -211,12 +211,14 @@ export const updateOrderStatus = async (
       throw new CustomError("Order not found", 404);
     }
     //if order status == pending
-    if (order.status === "pending") {
+    if (order.status.toLowerCase() === "pending") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
         data: { status: "processing" },
         include: {
           User: true,
+          restaurant: true,
+          Rider: true,
           CartItem: {
             include: {
               MenuItem: true,
@@ -227,12 +229,14 @@ export const updateOrderStatus = async (
       return updatedOrder;
     }
     //if order status == processing
-    if (order.status === "processing") {
+    if (order.status.toLowerCase() === "processing") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
         data: { status: "ready" },
         include: {
           User: true,
+          restaurant: true,
+          Rider: true,
           CartItem: {
             include: {
               MenuItem: true,
@@ -243,13 +247,14 @@ export const updateOrderStatus = async (
       return updatedOrder;
     }
     //if order status == ready
-    if (order.status === "ready") {
+    if (order.status.toLowerCase() === "ready") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
         data: { status: "looking for rider" },
         include: {
           User: true,
           restaurant: true,
+          Rider: true,
           CartItem: {
             include: {
               MenuItem: true,
@@ -280,12 +285,14 @@ export const updateOrderStatus = async (
       return updatedOrder;
     }
     //if order status == on the way
-    if (order.status === "on the way") {
+    if (order.status.toLowerCase() === "on the way") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
         data: { status: "delivered" },
         include: {
           User: true,
+          restaurant: true,
+          Rider: true,
           CartItem: {
             include: {
               MenuItem: true,
@@ -296,7 +303,7 @@ export const updateOrderStatus = async (
       return updatedOrder;
     }
     //if order status == delivered
-    if (order.status === "delivered") {
+    if (order.status.toLowerCase() === "delivered") {
       throw new CustomError("Order already delivered", 400);
     }
     throw new CustomError("Order Status Update Failed", 500);

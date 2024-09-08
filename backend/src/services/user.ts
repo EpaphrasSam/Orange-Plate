@@ -143,7 +143,9 @@ export const placeOrder = async (
   userId: string,
   total: number,
   restaurantId: string,
-  cartItems: string[]
+  cartItems: string[],
+  customerLatitude: number,
+  customerLongitude: number
 ) => {
   try {
     const order = await prisma.order.create({
@@ -151,6 +153,8 @@ export const placeOrder = async (
         userId,
         total,
         restaurantId,
+        latitude: customerLatitude,
+        longitude: customerLongitude,
         CartItem: {
           connect: cartItems.map((id) => ({ id })),
         },

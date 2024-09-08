@@ -110,6 +110,8 @@ model Order {
   restaurantId String
   Rider        Rider?     @relation(fields: [riderId], references: [id])
   riderId      String?
+  latitude     Decimal?   @db.Decimal(8, 6)
+  longitude    Decimal?   @db.Decimal(9, 6)
   // OrderItem    OrderItem[]
   CartItem     CartItem[]
   review       Review?
