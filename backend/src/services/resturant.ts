@@ -284,11 +284,11 @@ export const updateOrderStatus = async (
       );
       return updatedOrder;
     }
-    //if order status == on the way
-    if (order.status.toLowerCase() === "on the way") {
+    //if order status == rider assigned
+    if (order.status.toLowerCase() === "rider assigned") {
       const updatedOrder = await prisma.order.update({
         where: { id: orderId, restaurantId: restaurantId },
-        data: { status: "delivered" },
+        data: { status: "on the way" },
         include: {
           User: true,
           restaurant: true,
@@ -301,6 +301,10 @@ export const updateOrderStatus = async (
         },
       });
       return updatedOrder;
+    }
+    //if order status == "looking for rider"
+    if (order.status.toLowerCase() === "looking for rider") {
+      throw new CustomError("Waiting for rider to accept order", 400);
     }
     //if order status == delivered
     if (order.status.toLowerCase() === "delivered") {
