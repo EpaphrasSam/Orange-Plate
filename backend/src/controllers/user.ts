@@ -11,6 +11,7 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
     await jwt.verifyToken(token);
     await dataValidation.validateUserLocationData(userLocation);
     const restaurants = await userService.restaurantCloseBy(userLocation);
+    const allRestaurants = await userService.getAllRestaurants();
 
     const menuItems = (
       await Promise.all(
@@ -30,6 +31,7 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
       message: "Welcome to the home page",
       restaurantsWithoutMenuItems,
       menuItems,
+      search: allRestaurants,
     });
   } catch (err: any) {
     next({

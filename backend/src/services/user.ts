@@ -45,6 +45,20 @@ export const restaurantCloseBy = async (userLocation: {
   }
 };
 
+//get all restaurants
+export const getAllRestaurants = async () => {
+  try {
+    const restaurants = await prisma.restaurant.findMany({
+      include: {
+        menuItems: true,
+      },
+    });
+    return restaurants;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
+
 export const getMenuItem = async (id: string) => {
   try {
     const menuItem = await prisma.menuItem.findUnique({
