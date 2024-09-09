@@ -1,6 +1,7 @@
 import Orders from "@/components/pages/orders/Orders";
 import { updateSearchParams } from "@/utils/actions/searchParams.action";
 import { OrderStatus } from "@/types/order";
+import { getOrders } from "@/services/orderService";
 
 // Mock data for orders
 const ordersData = [
@@ -69,7 +70,7 @@ const getStatusColor = (status: OrderStatus, isSelected: boolean) => {
   }
 };
 
-export default function OrdersPage({
+export default async function OrdersPage({
   searchParams,
 }: {
   searchParams: { status?: string };
@@ -79,6 +80,7 @@ export default function OrdersPage({
   const filteredOrders = currentStatus
     ? ordersData.filter((order) => order.status.toLowerCase() === currentStatus)
     : ordersData;
+  const orders = await getOrders();
 
   return (
     <div className="p-4">

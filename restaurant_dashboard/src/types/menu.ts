@@ -3,9 +3,10 @@ export interface MenuItem {
   name: string;
   category: string;
   description: string;
-  readyIn: string;
-  ingredients: string;
-  serves: string;
+  // readyIn: string;
+  // ingredients: string;
+  // serves: string;
+  option: string;
   price: string;
   image: string;
 }

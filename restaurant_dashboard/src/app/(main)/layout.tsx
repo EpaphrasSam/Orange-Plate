@@ -1,4 +1,5 @@
 import Sidebar from "@/components/layout/Sidebar";
+import { SessionProvider } from "next-auth/react";
 
 export default function MainLayout({
   children,
@@ -6,6 +7,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
+    <SessionProvider>
     <main className="flex flex-col md:flex-row relative min-h-screen">
       <div className="md:hidden w-full">
         <Sidebar />
@@ -15,5 +17,6 @@ export default function MainLayout({
       </div>
       <div className="flex-1 bg-white p-4">{children}</div>
     </main>
+    </SessionProvider>
   );
 }

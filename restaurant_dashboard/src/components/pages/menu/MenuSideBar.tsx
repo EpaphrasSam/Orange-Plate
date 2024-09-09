@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import {
   Input,
@@ -16,6 +16,7 @@ import {
 } from "@nextui-org/react";
 import { MenuItem } from "@/types/menu";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiEdit } from "react-icons/fi";
 
 interface MenuSidebarProps {
   item: MenuItem;
@@ -33,10 +34,29 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
   isMobile,
 }) => {
   const { control, handleSubmit, reset } = useForm<MenuItem>();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [profile, setProfile] = useState<MenuItem>();
 
   useEffect(() => {
     reset(item);
   }, [item, reset]);
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile((prev) =>
+          prev ? { ...prev, image: reader.result as string } : undefined
+        );
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <Card
@@ -58,7 +78,29 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
             className="flex flex-col h-full"
           >
             <CardHeader className="flex justify-center pb-0">
-              <Avatar src={item.image} alt={item.name} size="lg" />
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <Avatar
+                    src={item.image || ""}
+                    alt="Restaurant Logo"
+                    className="w-24 h-24"
+                  />
+                  <button
+                    type="button"
+                    onClick={triggerFileInput}
+                    className="absolute bottom-0 right-0 bg-transparent rounded-full p-2 hover:opacity-80 transition-colors"
+                  >
+                    <FiEdit size={18} />
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleLogoUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </div>
             </CardHeader>
             <CardBody className="flex-grow overflow-y-auto scrollbar-thin">
               <div className="flex flex-col gap-4 p-4">
@@ -67,6 +109,12 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                   control={control}
                   defaultValue={item.name}
                   render={({ field }) => <Input label="Menu name" {...field} />}
+                />
+                <Controller
+                  name="option"
+                  control={control}
+                  defaultValue={item.option}
+                  render={({ field }) => <Input label="Option" {...field} />}
                 />
                 <Controller
                   name="description"
@@ -94,7 +142,7 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                     </Select>
                   )}
                 />
-                <div className="flex gap-4 justify-between">
+                {/* <div className="flex gap-4 justify-between">
                   <Controller
                     name="readyIn"
                     control={control}
@@ -117,7 +165,7 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                     defaultValue={item.serves}
                     render={({ field }) => <Input label="Serves" {...field} />}
                   />
-                </div>
+                </div> */}
                 <Controller
                   name="price"
                   control={control}

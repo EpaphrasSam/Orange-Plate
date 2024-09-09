@@ -1,6 +1,6 @@
 const axios = require("axios").default;
 
-const baseURL = "http://localhost:3000";
+const baseURL = "https://orange-plate.onrender.com";
 
 export default axios.create({
   baseURL,

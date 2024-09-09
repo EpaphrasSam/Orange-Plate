@@ -35,9 +35,10 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
       name: "",
       description: "",
       category: "",
-      readyIn: "",
-      ingredients: "",
-      serves: "",
+      // readyIn: "",
+      // ingredients: "",
+      // serves: "",
+      option: "",
       price: "0",
       image: "",
     });

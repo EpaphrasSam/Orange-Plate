@@ -9,12 +9,16 @@ import { Avatar, Divider } from "@nextui-org/react";
 import { MdLogout } from "react-icons/md";
 import { FaBars } from "react-icons/fa";
 import { Drawer } from "@mui/material";
-
+import { toast } from "react-hot-toast";
+import { logout } from "@/services/authService";
+import { useSession } from "next-auth/react";
 const Sidebar = () => {
+  const { data: session } = useSession();
   const pathname = usePathname();
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -25,6 +29,19 @@ const Sidebar = () => {
       clearInterval(timer);
     };
   }, []);
+
+  const handleLogout = async () => {
+    const loadingToast = toast.loading("Logging out...");
+    try {
+      await logout();
+      router.push("/login");
+      toast.dismiss(loadingToast);
+      toast.success("Logout successful");
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("Error during logout");
+    }
+  };
 
   const formattedDate = useMemo(() => {
     return currentTime.toLocaleDateString("en-US", {
@@ -54,8 +71,15 @@ const Sidebar = () => {
   const sidebarContent = (showText: boolean) => (
     <div className={`h-full flex flex-col ${showText ? "w-64" : "w-20"}`}>
       <div className="p-4 flex flex-col items-center space-y-4">
-        <Avatar src="" alt="Logo" />
-        {showText && <span className="text-xl font-bold">Star Bucks</span>}
+        <Avatar src="" alt="Logo" size="lg" isBordered />
+        {showText && (
+          <div className="flex flex-col gap-1 items-center">
+            <span className="text-xl font-bold">{session?.user?.name}</span>
+            <span className="text-xs font-semibold text-gray-700">
+              {session?.user?.email}
+            </span>
+          </div>
+        )}
         {showText && (
           <div className="text-center">
             <div className="text-sm">{formattedDate}</div>
@@ -84,7 +108,7 @@ const Sidebar = () => {
         } py-6 cursor-pointer text-red-500`}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => router.push("/login")}
+        onClick={handleLogout}
       >
         <motion.span className="text-2xl">
           <MdLogout />

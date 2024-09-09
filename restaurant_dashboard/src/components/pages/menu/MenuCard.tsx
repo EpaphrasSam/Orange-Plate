@@ -38,15 +38,15 @@ const MenuCard: React.FC<MenuItemProps> = ({ item, handleSelect }) => {
           />
           <div className="flex flex-col ">
             <p className="text-lg font-semibold text-gray-800">{item.name}</p>
-            <p className="text-sm text-gray-600 mb-1">{item.category}</p>
+            <p className="text-sm text-gray-600 mb-1">{item.option}</p>
           </div>
         </CardHeader>
         <CardBody className="flex flex-col items-start px-6 py-0 ">
-          <div className="text-sm text-gray-600 mb-1 flex-grow-0 overflow-y-auto scrollbar-thin max-h-[100px] h-full">
+          <div className="text-sm text-gray-600 mb-1 flex-grow-0 overflow-y-auto scrollbar-thin max-h-[150px] h-full">
             {item.description}
           </div>
           <Divider className="mt-6 mb-3" />
-          <div className="flex justify-between w-full mt-2">
+          {/* <div className="flex justify-between w-full mt-2">
             <div className="flex flex-col items-center gap-2">
               <span className="text-base font-semibold text-gray-800">
                 Ready in
@@ -67,7 +67,7 @@ const MenuCard: React.FC<MenuItemProps> = ({ item, handleSelect }) => {
               </span>
               <span className="text-sm text-gray-600">{item.serves}</span>
             </div>
-          </div>
+          </div> */}
           <CardFooter className="flex justify-between w-full mt-2">
             <span className="text-lg font-bold text-gray-700">
               ₵{item.price}

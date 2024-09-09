@@ -10,6 +10,9 @@ import { motion } from "framer-motion";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { login } from "@/services/authService";
+import { toast } from "react-hot-toast";
+import CustomSpinner from "@/components/ui/CustomSpinner";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -20,8 +23,9 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginCard = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const navigate = useRouter();
+  const router = useRouter();
 
   const {
     control,
@@ -31,8 +35,20 @@ const LoginCard = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data); // Handle login logic here
+  const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
+    try {
+      const res = await login(data.email, data.password);
+      router.push("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message); // This will now show "Restaurant not found or invalid credentials"
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -114,7 +130,8 @@ const LoginCard = () => {
               radius="sm"
               fullWidth
               style={{ backgroundColor: "#FCAF01", color: "white" }}
-              onClick={() => navigate.push("/")}
+              spinner={<CustomSpinner />}
+              isLoading={isLoading}
             >
               Login
             </Button>
