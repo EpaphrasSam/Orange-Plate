@@ -7,7 +7,12 @@ interface UserSignUpData {
   phone: string;
 }
 //create category
-export const createCategoryData = async (data: { name: string }[]) => {
+export const createCategoryData = async (
+  data: {
+    name: string;
+    image: string;
+  }[]
+) => {
   try {
     //check if data is an array
     if (!Array.isArray(data)) {
@@ -18,8 +23,8 @@ export const createCategoryData = async (data: { name: string }[]) => {
       throw new CustomError("Category can not be empty", 422);
     }
     data.forEach((item) => {
-      if (!item.name) {
-        throw new CustomError("Name is required", 422);
+      if (!item.name || !item.image) {
+        throw new CustomError("Name and image are required", 422);
       }
     });
   } catch (err: any) {

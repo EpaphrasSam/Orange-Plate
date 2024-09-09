@@ -35,6 +35,22 @@ export const createRestaurant = async (data: {
   }
 };
 
+export const createCategory = async (
+  categoryData: { name: string; image: string }[]
+) => {
+  try {
+    const category = await prisma.category.createMany({
+      data: categoryData,
+    });
+    return category;
+  } catch (err: any) {
+    if (err instanceof PrismaClientKnownRequestError) {
+      throw new CustomError(`Prisma error '${err.code}' occured`, 500);
+    }
+    throw new CustomError(err.message, 500);
+  }
+};
+
 export const createRider = async (data: {
   name: string;
   email: string;

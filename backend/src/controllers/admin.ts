@@ -3,6 +3,29 @@ import CustomError from "../util/error";
 import * as dataValidation from "../util/dataValidation";
 import * as adminService from "../services/admin";
 
+export const createCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const categoryData: {
+      name: string;
+      image: string;
+    }[] = req.body;
+    await dataValidation.createCategoryData(categoryData);
+    const newCategory = await adminService.createCategory(categoryData);
+    res.status(200).json({
+      message: "Category created successfully",
+      newCategory,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
 export const createRestaurant = async (
   req: Request,
   res: Response,
