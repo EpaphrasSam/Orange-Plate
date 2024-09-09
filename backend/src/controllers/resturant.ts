@@ -46,6 +46,8 @@ export const updateRestaurant = async (
       address: string;
       latitude: number;
       longitude: number;
+      openingHours: string;
+      closingHours: string;
     } = req.body;
     await jwt.verifyToken(token);
     await dataValidation.validateCreateRestaurantData(restaurantData);

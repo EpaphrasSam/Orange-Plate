@@ -19,6 +19,8 @@ export const updateRestaurant = async (
     address: string;
     latitude: number;
     longitude: number;
+    openingHours: string;
+    closingHours: string;
   },
   restaurantId: string
 ) => {
