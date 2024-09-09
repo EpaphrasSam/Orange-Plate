@@ -127,7 +127,7 @@ export const deleteCartItem = async (cartItemId: string, userId: string) => {
 export const getCartItems = async (userId: string) => {
   try {
     const cartItems = await prisma.cartItem.findMany({
-      where: { userId },
+      where: { userId, orderId: null },
       include: {
         MenuItem: true,
       },
