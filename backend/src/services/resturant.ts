@@ -38,6 +38,21 @@ export const updateRestaurant = async (
   }
 };
 
+//get restaurant by id
+export const getRestaurantById = async (restaurantId: string) => {
+  try {
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+      include: {
+        menuItems: true,
+      },
+    });
+    return restaurant;
+  } catch (err: any) {
+    throw new CustomError(err.message, 500);
+  }
+};
+
 //create password
 export const createPassword = async (email: string, password: string) => {
   try {

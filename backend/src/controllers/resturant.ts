@@ -5,6 +5,38 @@ import * as resturantService from "../services/resturant";
 import * as jwt from "../util/jwt";
 import * as notification from "../util/notification";
 
+//get restaurant by id
+export const getRestaurantById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token: any = req.headers.authorization;
+    const restaurantId: string = req.params.id;
+    await jwt.verifyToken(token);
+    await dataValidation.getById(restaurantId);
+    const restaurant = await resturantService.getRestaurantById(restaurantId);
+    const menuItems = restaurant?.menuItems.map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      option: item.option,
+    }));
+    res.status(200).json({
+      status: "Restaurant fetched successfully",
+      // restaurant,
+      menuItems,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
+
 //create password
 export const createPassword = async (
   req: Request,
