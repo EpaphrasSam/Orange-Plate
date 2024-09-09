@@ -42,3 +42,31 @@ export const sendRiderPickUpNotification = async (
     throw new CustomError("Failed to send notification", 500);
   }
 };
+
+//prompt user to make payment
+export const sendPaymentPromptNotification = async (order: {
+  id: string;
+  status: string;
+  total: number;
+  orderTime: Date;
+  deliveryTime: Date | null;
+  deliveryFee: number | null;
+  userId: string;
+  userName: string | undefined;
+  riderName: string | undefined;
+  vehicleNumber: string | undefined;
+  menuItems: {
+    name: string;
+    quantity: number;
+    price: number;
+    total: number;
+  }[];
+}) => {
+  try {
+    await pusher.trigger(`user-${order.userId}`, "payment-prompt", {
+      order,
+    });
+  } catch (err: any) {
+    throw new CustomError("Failed to send notification", 500);
+  }
+};
