@@ -65,30 +65,6 @@ export const updateRestaurant = async (
   }
 };
 
-//create category
-export const createCategory = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const token: any = req.headers.authorization;
-    const categoryData: { name: string }[] = req.body;
-    await jwt.verifyToken(token);
-    await dataValidation.createCategoryData(categoryData);
-    const category = await resturantService.createCategory(categoryData);
-    res.status(200).json({
-      status: "Category created successfully",
-      category,
-    });
-  } catch (err: any) {
-    next({
-      status: err.statusCode || 400,
-      message: err.message,
-    });
-  }
-};
-
 //create menu
 export const createMenu = async (
   req: Request,

@@ -35,20 +35,7 @@ export const updateRestaurant = async (
     throw new CustomError(err.message, 500);
   }
 };
-//create category
-export const createCategory = async (categoryData: { name: string }[]) => {
-  try {
-    const category = await prisma.category.createMany({
-      data: categoryData,
-    });
-    return category;
-  } catch (err: any) {
-    if (err instanceof PrismaClientKnownRequestError) {
-      throw new CustomError(`Prisma error '${err.code}' occured`, 500);
-    }
-    throw new CustomError(err.message, 500);
-  }
-};
+
 //create password
 export const createPassword = async (email: string, password: string) => {
   try {
