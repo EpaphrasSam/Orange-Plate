@@ -83,3 +83,71 @@ export const acceptOrder = async (riderId: string, orderId: string) => {
     throw new CustomError(err.message, err.statusCode || 400);
   }
 };
+
+//get rider orders
+export const getRiderOrders = async (riderId: string) => {
+  try {
+    const orders = await prisma.order.findMany({
+      orderBy: {
+        orderTime: "desc",
+      },
+      include: {
+        User: true,
+        restaurant: true,
+        Rider: true,
+        CartItem: {
+          include: {
+            MenuItem: true,
+          },
+        },
+      },
+    });
+    return orders;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 400);
+  }
+};
+
+//end trip
+export const endTrip = async (riderId: string, orderId: string) => {
+  try {
+    const order = await prisma.order.findFirst({
+      where: {
+        id: orderId,
+        riderId: riderId,
+        status: "on the way",
+      },
+    });
+    if (!order) {
+      throw new CustomError("Order not found", 404);
+    }
+    //calculate delivery fee: 10% of the order total
+    const deliveryFee = order.total * 0.1;
+    const updatedOrder = await prisma.order.update({
+      where: {
+        id: orderId,
+        riderId: riderId,
+        status: "on the way",
+      },
+      data: {
+        status: "delivered",
+        deliveryFee: deliveryFee,
+        deliveryTime: new Date(Date.now()),
+      },
+      include: {
+        User: true,
+        restaurant: true,
+        Rider: true,
+        CartItem: {
+          include: {
+            MenuItem: true,
+          },
+        },
+      },
+    });
+
+    return updatedOrder;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 400);
+  }
+};
