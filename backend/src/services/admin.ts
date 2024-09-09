@@ -11,6 +11,8 @@ export const createRestaurant = async (data: {
   address: string;
   latitude: number;
   longitude: number;
+  openingHours: string;
+  closingHours: string;
 }) => {
   try {
     const restaurant = await prisma.restaurant.create({
@@ -21,6 +23,8 @@ export const createRestaurant = async (data: {
         address: data.address,
         latitude: data.latitude,
         longitude: data.longitude,
+        openingHours: data.openingHours,
+        closingHours: data.closingHours,
       },
     });
     return restaurant;
