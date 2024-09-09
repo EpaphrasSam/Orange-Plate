@@ -11,11 +11,24 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
     await jwt.verifyToken(token);
     await dataValidation.validateUserLocationData(userLocation);
     const restaurants = await userService.restaurantCloseBy(userLocation);
-    const menuItems = await Promise.all(
-      restaurants.map((restaurant) => restaurant.menuItems)
-    );
+
+    const menuItems = (
+      await Promise.all(
+        restaurants.map((restaurant) =>
+          restaurant.menuItems.map((item) => ({
+            ...item,
+            restaurantName: restaurant.name,
+          }))
+        )
+      )
+    ).flat();
+    const restaurantsWithoutMenuItems = restaurants.map((restaurant) => {
+      const { menuItems, password, ...restaurantWithoutMenuItems } = restaurant;
+      return restaurantWithoutMenuItems;
+    });
     res.status(200).json({
       message: "Welcome to the home page",
+      restaurantsWithoutMenuItems,
       menuItems,
     });
   } catch (err: any) {
@@ -25,6 +38,7 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
+//
 
 export const getMenuItem = async (
   req: Request,
