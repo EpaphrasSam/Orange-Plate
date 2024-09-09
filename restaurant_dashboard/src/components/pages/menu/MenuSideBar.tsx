@@ -14,7 +14,7 @@ import {
   CardBody,
   CardFooter,
 } from "@nextui-org/react";
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "@/types/menuType";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit } from "react-icons/fi";
 

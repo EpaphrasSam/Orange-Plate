@@ -10,7 +10,7 @@ import {
   CardFooter,
   Divider,
 } from "@nextui-org/react";
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "@/types/menuType";
 import { FaEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import MenuCard from "./MenuCard";
-import { MenuItem } from "@/types/menu";
+import { MenuItem } from "@/types/menuType";
 import MenuSidebar from "./MenuSideBar";
 import { Input, Button } from "@nextui-org/react";
 import { Drawer, useMediaQuery, useTheme } from "@mui/material";
