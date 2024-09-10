@@ -111,6 +111,58 @@ export const validateCreateRestaurantData = async (data: {
   }
 };
 
+//validate update restaurant data
+export const validateUpdateRestaurantData = async (data: {
+  name: string;
+  phone: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  image: string;
+}) => {
+  try {
+    const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
+    const phoneFormat = /^(\+233|0)(20|23|24|26|27|28|50|54|53|55|59)\d{7}$/;
+    const { name, phone, latitude, longitude, address, image } = data;
+    //check if name,email,phone,latitude,longitude are not empty
+    if (!name || !phone || !latitude || !longitude || !address || !image) {
+      throw new CustomError(
+        "name,email,phone,latitude,longitude,address, image are required",
+        422
+      );
+    }
+
+    //check if phone number is valid
+    if (!phone.match(phoneFormat)) {
+      throw new CustomError("Invalid phone number", 422);
+    }
+    //check if name,phone,address, image are of type sring and latitude,longitude are of type number
+    if (
+      typeof name !== "string" ||
+      typeof phone !== "string" ||
+      typeof latitude !== "number" ||
+      typeof longitude !== "number" ||
+      typeof address !== "string" ||
+      typeof image !== "string"
+    ) {
+      throw new CustomError(
+        "name,email,phone,address,image are of type string and latitude,longitude must be of type float",
+        422
+      );
+    }
+    //check if latitude is between -90 and 90
+    if (latitude < -90 || latitude > 90) {
+      throw new CustomError("Latitude must be between -90 and 90", 422);
+    }
+    //check if longitude is between -180 and 180
+    if (longitude < -180 || longitude > 180) {
+      throw new CustomError("Longitude must be between -180 and 180", 422);
+    }
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode);
+  }
+};
+
 //create rider data validation
 export const validateCreateRiderData = async (data: {
   name: string;

@@ -14,11 +14,11 @@ import * as notification from "../util/notification";
 export const updateRestaurant = async (
   restaurantData: {
     name: string;
-    email: string;
     phone: string;
     address: string;
     latitude: number;
     longitude: number;
+    image: string;
     openingHours: string;
     closingHours: string;
   },

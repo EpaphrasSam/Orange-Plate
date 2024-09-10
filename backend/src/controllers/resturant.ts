@@ -74,16 +74,16 @@ export const updateRestaurant = async (
     const token: any = req.headers.authorization;
     const restaurantData: {
       name: string;
-      email: string;
       phone: string;
       address: string;
       latitude: number;
       longitude: number;
+      image: string;
       openingHours: string;
       closingHours: string;
     } = req.body;
     await jwt.verifyToken(token);
-    await dataValidation.validateCreateRestaurantData(restaurantData);
+    await dataValidation.validateUpdateRestaurantData(restaurantData);
     const updatedRestaurant = await resturantService.updateRestaurant(
       restaurantData,
       restaurantId
