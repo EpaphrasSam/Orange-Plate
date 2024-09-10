@@ -89,6 +89,7 @@ export const createMenu = async (
     description: string;
     price: number;
     option: string;
+    image: string;
     restaurantId: string;
     categoryId: string;
   }[]
@@ -111,17 +112,21 @@ export const createMenu = async (
 
 //update menu item
 export const updateMenuItem = async (
-  menuItemData: { name: string; description: string; price: number },
-  menuItemId: string,
-  restaurantId: string
+  menuItemData: {
+    name: string;
+    description: string;
+    price: number;
+    option: string;
+    image: string;
+    categoryId: string;
+  },
+  menuItemId: string
 ) => {
   try {
     //check if the menu item is not in any cart
     const menu = await prisma.menuItem.update({
       where: {
         id: menuItemId,
-        restaurantId: restaurantId,
-        CartItem: { none: {} },
       },
       data: menuItemData,
     });

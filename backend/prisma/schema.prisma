@@ -53,6 +53,7 @@ model MenuItem {
   price        Float
   option       String
   description  String
+  image        String?
   available    Boolean    @default(true)
   createdAt    DateTime   @default(now())
   Restaurant   Restaurant @relation(fields: [restaurantId], references: [id])

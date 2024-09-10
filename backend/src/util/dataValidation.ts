@@ -369,17 +369,18 @@ export const validateMenuData = async (
     }
 
     data.forEach((item: any) => {
-      //check if name, description, price, available, restaurantId are not empty
+      //check if name, description, price, restaurantId, categoryId, option, image are not empty
       if (
         !item.name ||
         !item.description ||
         !item.price ||
         !item.restaurantId ||
         !item.categoryId ||
-        !item.option
+        !item.option ||
+        !item.image
       ) {
         throw new CustomError(
-          "name. description, price, option. restaurantId, categoryId are required for each menu item",
+          "name. description, price, option. restaurantId, categoryId, image are required for each menu item",
           422
         );
       }
@@ -390,10 +391,11 @@ export const validateMenuData = async (
         typeof item.price !== "number" ||
         typeof item.restaurantId !== "string" ||
         typeof item.categoryId !== "string" ||
-        typeof item.option !== "string"
+        typeof item.option !== "string" ||
+        typeof item.image !== "string"
       ) {
         throw new CustomError(
-          "name, restaurantId and description must be of type string, price of type float, available of type boolean",
+          "name, restaurantId, option, image and description must be of type string, price of type float, available of type boolean",
           422
         );
       }
@@ -413,9 +415,11 @@ export const validateUpdateMenuItemData = async (
     name: string;
     description: string;
     price: number;
+    option: string;
+    image: string;
+    categoryId: string;
   },
-  id: string,
-  restaurantId: string
+  id: string
 ) => {
   try {
     //check if name, description, price are not empty
@@ -423,8 +427,9 @@ export const validateUpdateMenuItemData = async (
       !data.name ||
       !data.description ||
       !data.price ||
-      !id ||
-      !restaurantId
+      !data.option ||
+      !data.image ||
+      !data.categoryId
     ) {
       throw new CustomError("All fields are required", 422);
     }
@@ -433,10 +438,12 @@ export const validateUpdateMenuItemData = async (
       typeof data.description !== "string" ||
       typeof data.price !== "number" ||
       typeof id !== "string" ||
-      typeof restaurantId !== "string"
+      typeof data.option !== "string" ||
+      typeof data.image !== "string" ||
+      typeof data.categoryId !== "string"
     ) {
       throw new CustomError(
-        "name, description must be of type string, price of type number",
+        "name, description, option, image, categoryId must be of type string, price of type number",
         422
       );
     }

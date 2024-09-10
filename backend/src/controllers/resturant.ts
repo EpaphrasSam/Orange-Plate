@@ -113,7 +113,7 @@ export const createMenu = async (
       description: string;
       price: number;
       option: string;
-      restaurantId: string;
+      image: string;
       categoryId: string;
     }[] = req.body;
     const restaurantId: string = req.params.id;
@@ -122,6 +122,7 @@ export const createMenu = async (
       ...item,
       restaurantId,
     }));
+    console.log(menuItemsData);
     const token: any = req.headers.authorization;
     await jwt.verifyToken(token);
     await dataValidation.validateMenuData(menuItemsData);
@@ -145,20 +146,21 @@ export const updateMenuItem = async (
 ) => {
   try {
     const menuItemId: string = req.params.id;
-    const menuItemData: { name: string; description: string; price: number } =
-      req.body;
+    const menuItemData: {
+      name: string;
+      description: string;
+      option: string;
+      price: number;
+      image: string;
+      categoryId: string;
+    } = req.body;
     const token: any = req.headers.authorization;
     const user: any = await jwt.verifyToken(token);
-    await dataValidation.validateUpdateMenuItemData(
-      menuItemData,
-      menuItemId,
-      user.id
-    );
+    await dataValidation.validateUpdateMenuItemData(menuItemData, menuItemId);
     console.log(user.id);
     const updatedMenuItem = await resturantService.updateMenuItem(
       menuItemData,
-      menuItemId,
-      user.id
+      menuItemId
     );
     res.status(200).json({
       status: "Menu item updated successfully",
