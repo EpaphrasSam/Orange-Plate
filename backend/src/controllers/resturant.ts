@@ -23,7 +23,8 @@ export const getRestaurantById = async (
       description: item.description,
       price: item.price,
       option: item.option,
-      category: item.category.name,
+      categoryName: item.category.name,
+      categoryId: item.category.id,
     }));
     res.status(200).json({
       status: "Restaurant fetched successfully",
