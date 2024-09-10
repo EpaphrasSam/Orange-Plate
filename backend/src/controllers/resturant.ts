@@ -197,6 +197,28 @@ export const deleteMenuItem = async (
   }
 };
 
+//get all categories
+export const getAllCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token: any = req.headers.authorization;
+    await jwt.verifyToken(token);
+    const categories = await resturantService.getAllCategories();
+    res.status(200).json({
+      status: "Categories fetched successfully",
+      categories,
+    });
+  } catch (error: any) {
+    next({
+      status: error.statusCode || 400,
+      message: error.message,
+    });
+  }
+};
+
 //get orders
 export const getOrders = async (
   req: Request,

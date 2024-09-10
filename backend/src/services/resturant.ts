@@ -152,6 +152,19 @@ export const deleteMenuItem = async (
   }
 };
 
+//get all categories
+export const getAllCategories = async () => {
+  try {
+    const categories = await prisma.category.findMany({
+      include: {
+        MenuItem: true,
+      },
+    });
+    return categories;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
 //get orders
 export const getOrders = async (restaurantId: string) => {
   try {
