@@ -11,10 +11,11 @@ export const createRestaurant = async (data: {
   address: string;
   latitude: number;
   longitude: number;
-  openingHours: string;
-  closingHours: string;
+  // openingHours: string;
+  // closingHours: string;
 }) => {
   try {
+    const hashedPassword = await bcrypt.hashPassword(data.phone);
     const restaurant = await prisma.restaurant.create({
       data: {
         name: data.name,
@@ -23,8 +24,9 @@ export const createRestaurant = async (data: {
         address: data.address,
         latitude: data.latitude,
         longitude: data.longitude,
-        openingHours: data.openingHours,
-        closingHours: data.closingHours,
+        password: hashedPassword,
+        // openingHours: data.openingHours,
+        // closingHours: data.closingHours,
       },
     });
     return restaurant;

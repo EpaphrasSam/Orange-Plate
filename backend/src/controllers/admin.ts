@@ -39,8 +39,8 @@ export const createRestaurant = async (
       address: string;
       latitude: number;
       longitude: number;
-      openingHours: string;
-      closingHours: string;
+      // openingHours: string;
+      // closingHours: string;
     } = req.body;
     await dataValidation.validateCreateRestaurantData(restaurantData);
     const newRestaurant = await adminService.createRestaurant(restaurantData);
