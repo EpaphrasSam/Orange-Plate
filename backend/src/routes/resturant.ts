@@ -7,6 +7,7 @@ router.put("/update-restaurant/:id", resturantController.updateRestaurant); // u
 router.post("/create-menu/:id", resturantController.createMenu); // create menu
 router.post("/update-menu-item/:id", resturantController.updateMenuItem); // update menu item
 router.delete("/delete-menu-item/:id", resturantController.deleteMenuItem); // delete menu item
+router.get("/categories", resturantController.getAllCategories); // get all categories
 router.post("/create-password", resturantController.createPassword); // create password
 router.get("/orders/:id", resturantController.getOrders); // get orders
 router.get("/order/:id", resturantController.getOrder); // get order
