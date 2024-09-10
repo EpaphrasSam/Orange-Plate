@@ -42,7 +42,26 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
     });
   }
 };
-//
+
+//get all restaurants
+export const getAllRestaurants = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const restaurants = await userService.getAllRestaurants();
+    res.status(200).json({
+      message: "Restaurants fetched successfully",
+      restaurants,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
 
 export const getMenuItem = async (
   req: Request,

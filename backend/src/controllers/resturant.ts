@@ -20,6 +20,7 @@ export const getRestaurantById = async (
     const menuItems = restaurant?.menuItems.map((item) => ({
       id: item.id,
       name: item.name,
+      image: item.image,
       description: item.description,
       price: item.price,
       option: item.option,
