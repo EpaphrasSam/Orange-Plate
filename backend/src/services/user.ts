@@ -59,6 +59,20 @@ export const getAllRestaurants = async () => {
   }
 };
 
+//get all categories
+export const getAllCategories = async () => {
+  try {
+    const categories = await prisma.category.findMany({
+      include: {
+        MenuItem: true,
+      },
+    });
+    return categories;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
+
 export const getMenuItem = async (id: string) => {
   try {
     const menuItem = await prisma.menuItem.findUnique({

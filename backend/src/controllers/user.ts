@@ -12,6 +12,7 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
     await dataValidation.validateUserLocationData(userLocation);
     const restaurants = await userService.restaurantCloseBy(userLocation);
     const allRestaurants = await userService.getAllRestaurants();
+    const categoriesWithMenuItems = await userService.getAllCategories();
 
     const menuItems = (
       await Promise.all(
@@ -31,6 +32,7 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
       message: "Welcome to the home page",
       restaurantsWithoutMenuItems,
       menuItems,
+      categoriesWithMenuItems,
       search: allRestaurants,
     });
   } catch (err: any) {
