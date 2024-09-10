@@ -6,6 +6,9 @@ import Image from "next/image";
 import { Button, Card, Divider } from "@nextui-org/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Order, OrderStatus } from "@/types/orderType";
+import { updateOrderStatus } from "@/services/orderService";
+import { toast } from "react-hot-toast";
+import CustomSpinner from "@/components/ui/CustomSpinner";
 
 interface OrdersProps {
   orders: Order[];
@@ -16,6 +19,7 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
     orders[0] || null
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -53,23 +57,54 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
     }
   };
 
+  const handleUpdateOrderStatus = async (orderId: string) => {
+    try {
+      setIsLoading(true);
+      await updateOrderStatus(orderId);
+      toast.success("Order status updated successfully");
+    } catch (error) {
+      toast.error("Error updating order status");
+      console.error("Error updating order status:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderActionButton = (status: OrderStatus) => {
     switch (status) {
       case OrderStatus.Pending.toLowerCase():
         return (
-          <Button color="primary" className="max-w-[200px] w-full">
+          <Button
+            color="primary"
+            className="max-w-[200px] w-full"
+            onClick={() => handleUpdateOrderStatus(selectedOrder?.id || "")}
+            isLoading={isLoading}
+            spinner={<CustomSpinner />}
+          >
             Process
           </Button>
         );
       case OrderStatus.Processing.toLowerCase():
         return (
-          <Button color="success" className="max-w-[200px] w-full">
+          <Button
+            color="success"
+            className="max-w-[200px] w-full"
+            onClick={() => handleUpdateOrderStatus(selectedOrder?.id || "")}
+            isLoading={isLoading}
+            spinner={<CustomSpinner />}
+          >
             Ready
           </Button>
         );
       case OrderStatus.RiderAssigned.toLowerCase():
         return (
-          <Button color="warning" className="max-w-[200px] w-full">
+          <Button
+            color="warning"
+            className="max-w-[200px] w-full"
+            onClick={() => handleUpdateOrderStatus(selectedOrder?.id || "")}
+            isLoading={isLoading}
+            spinner={<CustomSpinner />}
+          >
             On the Way
           </Button>
         );
@@ -105,7 +140,7 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
               <div className="flex justify-between items-start">
                 <div className="flex flex-col mb-2">
                   <p className="text-xs font-bold text-gray-500">Order ID</p>
-                  <p className="text-gray-700 text-sm font-bold">
+                  <p className="text-gray-700 text-sm font-bold line-clamp-1 break-all">
                     #{selectedOrder?.id}
                   </p>
                 </div>
@@ -188,7 +223,10 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
                 </span>
               </div>
               <div className="mt-4 flex gap-4 justify-evenly">
-                {selectedOrder && renderActionButton(selectedOrder.status)}
+                {selectedOrder &&
+                  renderActionButton(
+                    selectedOrder.status.toLowerCase() as OrderStatus
+                  )}
               </div>
             </div>
           </motion.div>
@@ -237,9 +275,9 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col">
                     <p className="text-xs font-bold">Order ID</p>
-                    <h3 className="font-bold text-sm line-clamp-1">
+                    <p className="font-bold text-sm line-clamp-1 break-all">
                       #{order.id}
-                    </h3>
+                    </p>
                     <p className="mt-1">₵ {order.total.toFixed(2)}</p>
                   </div>
                   <div className="text-right flex flex-col items-end">
