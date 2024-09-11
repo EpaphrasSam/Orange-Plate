@@ -80,6 +80,17 @@ export const acceptOrder = async (riderId: string, orderId: string) => {
     }
     return order;
   } catch (err: any) {
+    //if err is an instance of prisma known error
+    if (err instanceof PrismaClientKnownRequestError) {
+      if (err.code === "P2025") {
+        throw new CustomError(
+          "Order not found: Only orders with status as loking for rider can be accepted",
+          404
+        );
+      }
+      throw new CustomError(`${err.message}\nError code: ${err.code}`, 400);
+    }
+
     throw new CustomError(err.message, err.statusCode || 400);
   }
 };

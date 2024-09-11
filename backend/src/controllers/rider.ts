@@ -40,8 +40,9 @@ export const acceptOrder = async (
   next: NextFunction
 ) => {
   const token: any = req.headers.authorization;
-  const riderId: string = req.query.riderId as string;
-  const orderId: string = req.query.orderId as string;
+  const { riderId, orderId } = req.body;
+  // const riderId: string = req.query.riderId as string;
+  // const orderId: string = req.query.orderId as string;
   try {
     await jwt.verifyToken(token);
     await dataValidation.getById(riderId);
