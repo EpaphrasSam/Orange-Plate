@@ -193,3 +193,25 @@ export const placeOrder = async (
     throw new CustomError(error.message, error.statusCode || 500);
   }
 };
+
+//get user orders
+export const getOrders = async (userId: string) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId },
+      include: {
+        restaurant: true,
+        Rider: true,
+        User: true,
+        CartItem: {
+          include: {
+            MenuItem: true,
+          },
+        },
+      },
+    });
+    return orders;
+  } catch (error: any) {
+    throw new CustomError(error.message, error.statusCode || 500);
+  }
+};
