@@ -11,6 +11,8 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  Accordion,
+  AccordionItem,
 } from "@nextui-org/react";
 import {
   AreaChart,
@@ -29,6 +31,7 @@ import {
   FiShoppingCart,
   FiDollarSign,
 } from "react-icons/fi";
+import { OrderStatus } from "@/types/orderType";
 
 const iconMap = {
   FiDollarSign,
@@ -39,13 +42,13 @@ const iconMap = {
 
 interface DashboardProps {
   data: {
-    summary: Array<{ title: string; value: string; icon: string }>;
+    summary: Array<{ title: string; value: string | number; icon: string }>;
     recentOrders: Array<{
       id: string;
       customer: string;
-      items: string;
-      total: string;
-      status: string;
+      items: Array<{ name: string; quantity: number }>;
+      total: number;
+      status: OrderStatus;
     }>;
     topPurchased: Array<{ name: string; value: number }>;
     salesData: Array<{ time: string; sales: number }>;
@@ -75,6 +78,27 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
     },
   };
 
+  const getStatusColor = (status: OrderStatus) => {
+    switch (status) {
+      case OrderStatus.Pending.toLowerCase():
+        return "bg-yellow-100 text-yellow-800";
+      case OrderStatus.Processing.toLowerCase():
+        return "bg-blue-100 text-blue-800";
+      case OrderStatus.Ready.toLowerCase():
+        return "bg-green-100 text-green-800";
+      case OrderStatus.LookingForRider.toLowerCase():
+        return "bg-purple-100 text-purple-800";
+      case OrderStatus.RiderAssigned.toLowerCase():
+        return "bg-indigo-100 text-indigo-800";
+      case OrderStatus.OnTheWay.toLowerCase():
+        return "bg-orange-100 text-orange-800";
+      case OrderStatus.Delivered.toLowerCase():
+        return "bg-green-200 text-green-900";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <motion.div
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
@@ -89,7 +113,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
         let bgColor = "#FFF5E6";
 
         switch (item.title) {
-          case "Total Income (₵)":
+          case "Total Revenue":
             iconColor = "#4CAF50";
             bgColor = "#E8F5E9";
             break;
@@ -97,11 +121,11 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
             iconColor = "#2196F3";
             bgColor = "#E3F2FD";
             break;
-          case "Daily Sales":
+          case "Total Customers":
             iconColor = "#FF5722";
             bgColor = "#FBE9E7";
             break;
-          case "Average Satisfaction":
+          case "Avg. Order Value":
             iconColor = "#9C27B0";
             bgColor = "#F3E5F5";
             break;
@@ -146,14 +170,13 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                 <AreaChart data={data.salesData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="time" />
-                  <YAxis />
+                  <YAxis domain={[0, "dataMax + 100"]} />
                   <Tooltip />
                   <Area
                     type="monotone"
                     dataKey="sales"
                     stroke="#FCAF01"
-                    fill="#FCAF01"
-                    fillOpacity={0.3}
+                    fill="#FFF5E6"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -172,7 +195,7 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                 <BarChart data={data.topPurchased}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
-                  <YAxis />
+                  <YAxis domain={[0, "dataMax + 5"]} />
                   <Tooltip />
                   <Bar dataKey="value" fill="#FCAF01" />
                 </BarChart>
@@ -203,17 +226,23 @@ const Dashboard: React.FC<DashboardProps> = ({ data }) => {
                 {data.recentOrders.map((order) => (
                   <TableRow key={order.id}>
                     <TableCell>{order.customer}</TableCell>
-                    <TableCell>{order.items}</TableCell>
-                    <TableCell>{order.total}</TableCell>
+                    <TableCell>
+                      <Accordion>
+                        <AccordionItem title={`${order.items.length} items`}>
+                          {order.items.map((item, index) => (
+                            <div key={index}>
+                              {item.name} x{item.quantity}
+                            </div>
+                          ))}
+                        </AccordionItem>
+                      </Accordion>
+                    </TableCell>
+                    <TableCell>₵{order.total.toFixed(2)}</TableCell>
                     <TableCell>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          order.status === "Completed"
-                            ? "bg-green-100 text-green-800"
-                            : order.status === "Processing"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`px-2 py-1 capitalize rounded-full text-xs font-semibold ${getStatusColor(
+                          order.status.toLowerCase() as OrderStatus
+                        )}`}
                       >
                         {order.status}
                       </span>
