@@ -94,7 +94,7 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                     uploadPreset={
                       process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME
                     }
-                    className="absolute bottom-0 right-0 bg-transparent rounded-full p-2 hover:opacity-80 transition-colors"
+                    className="absolute bottom-0 right-0 bg-gray-300 rounded-full p-2 hover:opacity-80 transition-colors"
                   >
                     <FiEdit size={18} />
                   </CldUploadButton>

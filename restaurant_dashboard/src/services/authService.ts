@@ -44,6 +44,7 @@ export async function logout() {
 
 export async function updateProfile(restaurantId: string, data: any) {
   try {
+    console.log(data);
     const session = await auth();
     const res = await axios.put(
       `restaurant/update-restaurant/${restaurantId}`,
@@ -65,6 +66,7 @@ export async function updateProfile(restaurantId: string, data: any) {
         name: updatedUser.name,
         email: updatedUser.email,
         phone: updatedUser.phone,
+        image: updatedUser.image,
         address: updatedUser.address,
         latitude: updatedUser.latitude,
         longitude: updatedUser.longitude,

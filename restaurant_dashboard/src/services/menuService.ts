@@ -53,7 +53,7 @@ export const createMenuItem = async (
 ): Promise<boolean> => {
   try {
     const session = await auth();
-    const res = await axios.post(
+    await axios.post(
       `/restaurant/create-menu/${session?.user?.id}`,
       [
         {
@@ -80,8 +80,7 @@ export const updateMenuItem = async (menuItem: MenuItem): Promise<boolean> => {
   try {
     const session = await auth();
     const { id, ...data } = menuItem;
-    console.log(data);
-    const res = await axios.post(
+    await axios.post(
       `/restaurant/update-menu-item/${id}`,
       {
         ...data,

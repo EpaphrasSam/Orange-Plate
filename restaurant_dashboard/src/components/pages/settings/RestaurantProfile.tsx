@@ -8,6 +8,7 @@ import { z } from "zod";
 import { updateProfile } from "@/services/authService";
 import CustomSpinner from "@/components/ui/CustomSpinner";
 import { toast } from "react-hot-toast";
+import { CldUploadButton } from "next-cloudinary";
 
 const profileSchema = z.object({
   name: z.string().min(1, "Restaurant name is required"),
@@ -16,6 +17,7 @@ const profileSchema = z.object({
   address: z.string().min(1, "Address is required"),
   openingHours: z.string().min(1, "Opening hours are required"),
   closingHours: z.string().min(1, "Closing hours are required"),
+  image: z.string().optional(),
 });
 
 const RestaurantProfile = () => {
@@ -31,18 +33,17 @@ const RestaurantProfile = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (session?.user) {
       setProfile({
         name: session.user.name || "",
         phone: session.user.phone || "",
+        image: session.user.image || "",
         email: session.user.email || "",
         address: session.user.address || "",
         openingHours: session.user.openingHours || "",
         closingHours: session.user.closingHours || "",
-        image: null,
       });
     }
   }, [session]);
@@ -66,7 +67,7 @@ const RestaurantProfile = () => {
           longitude: parseFloat(session.user.longitude),
           latitude: parseFloat(session.user.latitude),
         });
-        
+
         // Refresh the session to get the updated data
         await updateSession();
       }
@@ -88,19 +89,11 @@ const RestaurantProfile = () => {
     }
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) => ({ ...prev, image: reader.result as string }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
+  const handleLogoUpload = (result: any) => {
+    console.log(result);
+    const imageUrl = result.info.secure_url;
+    setProfile((prev) => ({ ...prev, image: imageUrl }));
+    toast.success("Image uploaded successfully");
   };
 
   return (
@@ -112,21 +105,15 @@ const RestaurantProfile = () => {
             alt="Restaurant Logo"
             className="w-24 h-24"
           />
-          <button
-            type="button"
-            onClick={triggerFileInput}
-            className="absolute bottom-0 right-0 bg-transparent rounded-full p-2 hover:opacity-80 transition-colors"
+          <CldUploadButton
+            options={{ maxFiles: 1 }}
+            onSuccess={handleLogoUpload}
+            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME}
+            className="absolute bottom-0 right-0 bg-gray-300 rounded-full p-2 hover:opacity-80 transition-colors"
           >
             <FiEdit size={18} />
-          </button>
+          </CldUploadButton>
         </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleLogoUpload}
-          accept="image/*"
-          className="hidden"
-        />
       </div>
       <Input
         label="Email"
@@ -138,7 +125,6 @@ const RestaurantProfile = () => {
         isReadOnly
       />
       <div className="flex flex-col md:flex-row gap-4">
-        
         <Input
           label="Restaurant Name"
           name="name"
@@ -158,7 +144,7 @@ const RestaurantProfile = () => {
           isInvalid={!!errors.phone}
         />
       </div>
-      
+
       <Textarea
         label="Address"
         name="address"

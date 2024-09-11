@@ -70,7 +70,12 @@ const Sidebar = () => {
   const sidebarContent = (showText: boolean) => (
     <div className={`h-full flex flex-col ${showText ? "w-64" : "w-20"}`}>
       <div className="p-4 flex flex-col items-center space-y-4">
-        <Avatar src="" alt="Logo" size="lg" isBordered />
+        <Avatar
+          src={session?.user?.image || ""}
+          alt="Logo"
+          size="lg"
+          isBordered
+        />
         {showText && (
           <div className="flex flex-col gap-1 items-center">
             <span className="text-lg font-bold text-center">
