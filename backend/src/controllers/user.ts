@@ -241,3 +241,27 @@ export const placeOrder = async (
     });
   }
 };
+
+//get user orders
+export const getOrders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId: string = req.params.id;
+    const token: any = req.headers.authorization;
+    await jwt.verifyToken(token);
+    await dataValidation.getById(userId);
+    const orders = await userService.getOrders(userId);
+    res.status(200).json({
+      message: "Orders fetched successfully",
+      orders,
+    });
+  } catch (error: any) {
+    next({
+      status: error.statusCode || 400,
+      message: error.message,
+    });
+  }
+};
