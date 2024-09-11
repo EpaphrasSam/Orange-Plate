@@ -96,6 +96,18 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
             Ready
           </Button>
         );
+      case OrderStatus.Ready.toLowerCase():
+        return (
+          <Button
+            color="warning"
+            className="max-w-[200px] w-full"
+            onClick={() => handleUpdateOrderStatus(selectedOrder?.id || "")}
+            isLoading={isLoading}
+            spinner={<CustomSpinner />}
+          >
+            Look for Rider
+          </Button>
+        );
       case OrderStatus.RiderAssigned.toLowerCase():
         return (
           <Button
@@ -105,9 +117,10 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
             isLoading={isLoading}
             spinner={<CustomSpinner />}
           >
-            On the Way
+            Start Delivery
           </Button>
         );
+
       default:
         return null;
     }

@@ -38,6 +38,7 @@ export interface Order {
       price: number;
       option: string;
       description: string;
+      image: string;
       available: boolean;
       createdAt: string;
       restaurantId: string;

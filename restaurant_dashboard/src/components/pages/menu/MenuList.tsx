@@ -9,6 +9,8 @@ import { Drawer, useMediaQuery, useTheme } from "@mui/material";
 import debounce from "lodash/debounce";
 import { FiPlus, FiSearch } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
+import { createMenuItem, updateMenuItem } from "@/services/menuService";
 
 interface MenuListProps {
   menuData: MenuItem[];
@@ -19,6 +21,7 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredMenu, setFilteredMenu] = useState(menuData);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
 
@@ -34,24 +37,40 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
       id: "",
       name: "",
       description: "",
-      category: "",
-      // readyIn: "",
-      // ingredients: "",
-      // serves: "",
       option: "",
       price: "0",
       image: "",
+      categoryId: "",
     });
     if (isMobile) {
       setIsDrawerOpen(true);
     }
   };
 
-  const handleSubmit = (item: MenuItem) => {
-    console.log(item);
-    // API call will be handled here
-    setSelectedItem(null);
-    setIsDrawerOpen(false);
+  const handleSubmit = async (item: MenuItem) => {
+    setIsSubmitting(true);
+    try {
+      if (item.id) {
+        // Editing existing item
+        await updateMenuItem(item);
+        toast.success("Menu item updated successfully");
+      } else {
+        // Creating new item
+        const { id, ...newItem } = item; // Filter out the id for new items
+        await createMenuItem(newItem);
+        toast.success("New menu item created successfully");
+      }
+      setSelectedItem(null);
+      setIsDrawerOpen(false);
+      // Refresh the menu data here (you might want to add a function to fetch updated menu data)
+    } catch (error) {
+      toast.error(
+        item.id ? "Failed to update menu item" : "Failed to create menu item"
+      );
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSearch = debounce((value: string) => {
@@ -103,22 +122,35 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
           layout
         >
           <AnimatePresence>
-            {filteredMenu.map((item) => (
+            {filteredMenu.length > 0 ? (
+              filteredMenu.map((item) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <MenuCard item={item} handleSelect={handleSelect} />
+                </motion.div>
+              ))
+            ) : (
               <motion.div
-                key={item.id}
-                layout
+                className="col-span-full flex justify-center items-center h-[200px]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <MenuCard item={item} handleSelect={handleSelect} />
+                <p className="text-gray-500 text-xl font-bold">
+                  No menu items found
+                </p>
               </motion.div>
-            ))}
+            )}
           </AnimatePresence>
         </motion.div>
         {!isMobile && selectedItem && (
           <motion.div
-            className="hidden lg:block w-1/3 sticky top-0 h-screen"
+            className="hidden lg:block w-[500px] sticky top-0 h-screen"
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
@@ -129,6 +161,8 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
               onSubmit={handleSubmit}
               setSelectedItem={setSelectedItem}
               isMobile={isMobile}
+              isSubmitting={isSubmitting}
+              isEditMode={!!selectedItem.id} // Pass this prop to MenuSidebar
             />
           </motion.div>
         )}
@@ -147,6 +181,8 @@ const MenuList: React.FC<MenuListProps> = ({ menuData }) => {
                   onSubmit={handleSubmit}
                   setSelectedItem={setSelectedItem}
                   isMobile={isMobile}
+                  isSubmitting={isSubmitting}
+                  isEditMode={!!selectedItem.id}
                 />
               )}
             </div>

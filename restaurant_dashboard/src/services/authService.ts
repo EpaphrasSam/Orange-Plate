@@ -1,6 +1,6 @@
 "use server";
 
-import { auth, signIn, signOut } from "@/utils/auth";
+import { auth, signIn, signOut, unstable_update } from "@/utils/auth";
 import axios from "@/utils/axios";
 
 export async function login(email: string, password: string) {
@@ -54,6 +54,26 @@ export async function updateProfile(restaurantId: string, data: any) {
         },
       }
     );
+
+    const updatedUser = res.data.updatedRestaurant;
+
+    // Update the session with the new data
+    await unstable_update({
+      ...session,
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        address: updatedUser.address,
+        latitude: updatedUser.latitude,
+        longitude: updatedUser.longitude,
+        openingHours: updatedUser.openingHours,
+        closingHours: updatedUser.closingHours,
+        token: session?.user?.token, // Keep the existing token
+      },
+    });
+
     return res.data;
   } catch (error: any) {
     console.log(error.response?.data);

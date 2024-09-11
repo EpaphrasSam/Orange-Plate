@@ -33,6 +33,7 @@
     "react-use": "^17.5.1",
     "recharts": "^2.12.7",
     "restaurant_dashboard": "file:",
+    "swr": "^2.2.5",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",

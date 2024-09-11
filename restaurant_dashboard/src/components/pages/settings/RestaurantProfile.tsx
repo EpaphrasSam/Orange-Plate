@@ -19,7 +19,7 @@ const profileSchema = z.object({
 });
 
 const RestaurantProfile = () => {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [profile, setProfile] = useState({
     name: "",
     phone: "",
@@ -66,6 +66,9 @@ const RestaurantProfile = () => {
           longitude: parseFloat(session.user.longitude),
           latitude: parseFloat(session.user.latitude),
         });
+        
+        // Refresh the session to get the updated data
+        await updateSession();
       }
       toast.success("Profile updated successfully");
     } catch (error) {
@@ -125,7 +128,17 @@ const RestaurantProfile = () => {
           className="hidden"
         />
       </div>
+      <Input
+        label="Email"
+        name="email"
+        value={profile.email}
+        onChange={handleChange}
+        errorMessage={errors.email}
+        isInvalid={!!errors.email}
+        isReadOnly
+      />
       <div className="flex flex-col md:flex-row gap-4">
+        
         <Input
           label="Restaurant Name"
           name="name"
@@ -145,14 +158,7 @@ const RestaurantProfile = () => {
           isInvalid={!!errors.phone}
         />
       </div>
-      <Input
-        label="Email"
-        name="email"
-        value={profile.email}
-        onChange={handleChange}
-        errorMessage={errors.email}
-        isInvalid={!!errors.email}
-      />
+      
       <Textarea
         label="Address"
         name="address"

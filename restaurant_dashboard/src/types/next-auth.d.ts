@@ -9,6 +9,7 @@ declare module "next-auth" {
       email: string;
       phone: string;
       address: string;
+      image: string;
       latitude: string;
       longitude: string;
       openingHours: string | null;
@@ -22,6 +23,7 @@ declare module "next-auth" {
     address: string;
     latitude: string;
     longitude: string;
+    image: string;
     openingHours: string | null;
     closingHours: string | null;
     token: string;
@@ -39,6 +41,7 @@ declare module "next-auth/jwt" {
     longitude: string;
     openingHours: string | null;
     closingHours: string | null;
+    image: string;
     accessToken: string;
   }
 }

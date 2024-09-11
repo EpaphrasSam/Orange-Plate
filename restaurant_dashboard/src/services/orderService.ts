@@ -24,12 +24,18 @@ export const updateOrderStatus = async (orderId: string) => {
   try {
     const session = await auth();
     console.log(orderId, session?.user?.token);
-    await axios.put(`/restaurant/update-order-status/${orderId}`, {
-      headers: { Authorization: `${session?.user?.token}` },
-    });
+    const res = await axios.put(
+      `/restaurant/update-order-status/${orderId}`,
+      {},
+      {
+        headers: {
+          Authorization: `${session?.user?.token}`,
+        },
+      }
+    );
     revalidatePath("/orders");
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error(error.response.data);
     throw new Error("Failed to update order status. Please try again later.");
   }

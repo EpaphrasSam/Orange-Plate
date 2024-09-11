@@ -14,28 +14,39 @@ import {
   CardBody,
   CardFooter,
 } from "@nextui-org/react";
-import { MenuItem } from "@/types/menuType";
+import { MenuItem, CategoryType } from "@/types/menuType";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiEdit } from "react-icons/fi";
+import useSWR from "swr";
+import { getCategories } from "@/services/menuService";
+import CustomSpinner from "@/components/ui/CustomSpinner";
 
 interface MenuSidebarProps {
   item: MenuItem;
   onSubmit: (data: MenuItem) => void;
   setSelectedItem: (item: MenuItem | null) => void;
   isMobile: boolean;
+  isSubmitting: boolean;
+  isEditMode: boolean; // Add this new prop
 }
-
-const categories = ["Pepper Jollof", "Chicken & Tomato", "Assorted Fried Rice"];
 
 const MenuSidebar: React.FC<MenuSidebarProps> = ({
   item,
   onSubmit,
   setSelectedItem,
   isMobile,
+  isSubmitting,
+  isEditMode, // Destructure the new prop
 }) => {
   const { control, handleSubmit, reset } = useForm<MenuItem>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<MenuItem>();
+
+  const {
+    data: categories,
+    error,
+    isLoading,
+  } = useSWR<CategoryType[]>("categories", getCategories);
 
   useEffect(() => {
     reset(item);
@@ -57,6 +68,9 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
+
+  // if (error) return <div>Failed to load categories</div>;
+  // if (!categories) return <div>Loading categories...</div>;
 
   return (
     <Card
@@ -125,20 +139,29 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                   )}
                 />
                 <Controller
-                  name="category"
+                  name="categoryId"
                   control={control}
-                  defaultValue={item.category}
-                  render={({ field }) => (
+                  defaultValue={item.categoryId}
+                  render={({ field: { onChange, value, ...rest } }) => (
                     <Select
                       label="Category"
-                      {...field}
-                      selectedKeys={[item.category]}
+                      selectedKeys={value ? [value] : []}
+                      onSelectionChange={(keys) =>
+                        onChange(Array.from(keys)[0])
+                      }
+                      isLoading={isLoading}
+                      placeholder="Select a category"
+                      {...rest}
                     >
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
                         </SelectItem>
-                      ))}
+                      )) ?? (
+                        <SelectItem key="no-categories">
+                          No categories found
+                        </SelectItem>
+                      )}
                     </Select>
                   )}
                 />
@@ -190,8 +213,11 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
                 type="submit"
                 color="primary"
                 className="bg-[#FCAF01] w-[120px]"
+                isLoading={isSubmitting}
+                spinner={<CustomSpinner />}
               >
-                Apply
+                {isEditMode ? "Update" : "Create"}{" "}
+                {/* Change button text based on mode */}
               </Button>
             </CardFooter>
           </motion.div>

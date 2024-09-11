@@ -19,7 +19,6 @@ const Sidebar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -74,7 +73,9 @@ const Sidebar = () => {
         <Avatar src="" alt="Logo" size="lg" isBordered />
         {showText && (
           <div className="flex flex-col gap-1 items-center">
-            <span className="text-xl font-bold">{session?.user?.name}</span>
+            <span className="text-lg font-bold text-center">
+              {session?.user?.name}
+            </span>
             <span className="text-xs font-semibold text-gray-700">
               {session?.user?.email}
             </span>
