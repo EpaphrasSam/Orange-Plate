@@ -236,7 +236,6 @@ export const getOrders = async (
     const user: any = await jwt.verifyToken(token);
     await dataValidation.getById(restaurantId);
     const orders = await resturantService.getOrders(restaurantId);
-    console.log(orders);
     res.status(200).json({
       status: "Orders fetched successfully",
       orders,
