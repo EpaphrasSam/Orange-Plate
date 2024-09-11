@@ -181,6 +181,7 @@ export const getOrders = async (restaurantId: string) => {
       where: { restaurantId: restaurantId },
       include: {
         User: true,
+        Rider: true,
         CartItem: {
           include: {
             MenuItem: true,
@@ -204,6 +205,7 @@ export const getOrder = async (orderId: string, restaurantId: string) => {
       where: { id: orderId, restaurantId: restaurantId },
       include: {
         User: true,
+        Rider: true,
         CartItem: {
           include: {
             MenuItem: true,
