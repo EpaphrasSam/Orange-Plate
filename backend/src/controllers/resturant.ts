@@ -302,3 +302,33 @@ export const updateOrderStatus = async (
     });
   }
 };
+
+export const getStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const restaurantId: string = req.params.id;
+    const token: any = req.headers.authorization;
+    await jwt.verifyToken(token);
+    await dataValidation.getById(restaurantId);
+    const orders = await resturantService.getOrders(restaurantId);
+    //filter orders by status
+    const sales = orders.filter((order) => order.status === "delivered");
+    const totalSales = sales.length;
+    const totalRevenue = sales.reduce((total, order) => total + order.total, 0);
+    const totalOrders = orders.length;
+    res.status(200).json({
+      status: "Statistics fetched successfully",
+      totalSales,
+      totalRevenue,
+      totalOrders,
+    });
+  } catch (error: any) {
+    next({
+      status: error.statusCode || 400,
+      message: error.message,
+    });
+  }
+};

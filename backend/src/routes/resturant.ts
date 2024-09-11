@@ -12,6 +12,7 @@ router.post("/create-password", resturantController.createPassword); // create p
 router.get("/orders/:id", resturantController.getOrders); // get orders
 router.get("/order/:id", resturantController.getOrder); // get order
 router.put("/update-order-status/:id", resturantController.updateOrderStatus); // update order status
+router.get("/statistics/:id", resturantController.getStatistics); //get statistics
 
 router.get("/:id", resturantController.getRestaurantById); // get restaurant by id
 
