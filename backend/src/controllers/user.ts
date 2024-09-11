@@ -211,7 +211,7 @@ export const placeOrder = async (
       restaurantId: string;
       customerLatitude: number;
       customerLongitude: number;
-      cartItems: string[];
+      cartItems: [];
     } = req.body;
     const token: any = req.headers.authorization;
     await jwt.verifyToken(token);

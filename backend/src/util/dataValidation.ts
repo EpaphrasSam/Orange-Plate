@@ -549,7 +549,7 @@ export const validateEditCartItemData = async (quantity: number) => {
 export const validatePlaceOrderData = async (
   total: number,
   restaurantId: string,
-  cartItems: string[],
+  cartItems: [],
   latitude: number,
   longitude: number
 ) => {
@@ -559,15 +559,15 @@ export const validatePlaceOrderData = async (
       throw new CustomError("Cart items must be an array", 422);
     }
     //check if cartItems is not empty
-    if (cartItems.length === 0) {
+    if (cartItems.length < 1) {
       throw new CustomError("Cart items can not be empty", 422);
     }
-    //check if cartItems is an array of strings
-    cartItems.forEach((item) => {
-      if (typeof item !== "string") {
-        throw new CustomError("Cart items must be an array of strings", 422);
-      }
-    });
+    // //check if cartItems is an array of strings
+    // cartItems.forEach((item) => {
+    //   if (typeof item !== "string") {
+    //     throw new CustomError("Cart items must be an array of strings", 422);
+    //   }
+    // });
     // check if latitude and longitude are not empty
     if (!latitude || !longitude) {
       throw new CustomError("Latitude and longitude are required", 422);
