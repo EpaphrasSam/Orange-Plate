@@ -20,6 +20,8 @@ import { FiEdit } from "react-icons/fi";
 import useSWR from "swr";
 import { getCategories } from "@/services/menuService";
 import CustomSpinner from "@/components/ui/CustomSpinner";
+import { CldUploadButton } from "next-cloudinary";
+import toast from "react-hot-toast";
 
 interface MenuSidebarProps {
   item: MenuItem;
@@ -38,9 +40,8 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
   isSubmitting,
   isEditMode, // Destructure the new prop
 }) => {
-  const { control, handleSubmit, reset } = useForm<MenuItem>();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [profile, setProfile] = useState<MenuItem>();
+  const { control, handleSubmit, reset, setValue } = useForm<MenuItem>();
+  const [image, setImage] = useState("");
 
   const {
     data: categories,
@@ -52,25 +53,13 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
     reset(item);
   }, [item, reset]);
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfile((prev) =>
-          prev ? { ...prev, image: reader.result as string } : undefined
-        );
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleUpload = (result: any) => {
+    console.log(result);
+    const imageUrl = result.info.secure_url;
+    setValue("image", imageUrl);
+    setImage(imageUrl);
+    toast.success("Image uploaded successfully");
   };
-
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  // if (error) return <div>Failed to load categories</div>;
-  // if (!categories) return <div>Loading categories...</div>;
 
   return (
     <Card
@@ -95,25 +84,21 @@ const MenuSidebar: React.FC<MenuSidebarProps> = ({
               <div className="flex justify-center mb-6">
                 <div className="relative">
                   <Avatar
-                    src={item.image || ""}
+                    src={item.image || image || ""}
                     alt="Restaurant Logo"
                     className="w-24 h-24"
                   />
-                  <button
-                    type="button"
-                    onClick={triggerFileInput}
+                  <CldUploadButton
+                    options={{ maxFiles: 1 }}
+                    onSuccess={handleUpload}
+                    uploadPreset={
+                      process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME
+                    }
                     className="absolute bottom-0 right-0 bg-transparent rounded-full p-2 hover:opacity-80 transition-colors"
                   >
                     <FiEdit size={18} />
-                  </button>
+                  </CldUploadButton>
                 </div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleLogoUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
               </div>
             </CardHeader>
             <CardBody className="flex-grow overflow-y-auto scrollbar-thin">
