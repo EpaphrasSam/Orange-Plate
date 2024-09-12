@@ -1,7 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/functions/back_button_func.dart';
+import 'package:mobile/services/api_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
-class DeliveryProfileScreen extends StatelessWidget {
+class DeliveryProfileScreen extends StatefulWidget {
+  @override
+  _DeliveryProfileScreenState createState() => _DeliveryProfileScreenState();
+}
+
+class _DeliveryProfileScreenState extends State<DeliveryProfileScreen> {
+  final ApiService apiService = ApiService();
+  Map<String, dynamic> riderData = {};
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRiderData();
+  }
+
+  Future<void> _loadRiderData() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      Map<String, dynamic> data = await apiService.fetchRiderHome(
+        position.latitude,
+        position.longitude,
+      );
+
+      setState(() {
+        riderData = data['rider'];
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading rider data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,34 +54,49 @@ class DeliveryProfileScreen extends StatelessWidget {
             icon: const Icon(Icons.edit),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => EditProfileScreen()),
+              MaterialPageRoute(
+                  builder: (_) => EditProfileScreen(riderData: riderData)),
             ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const CircleAvatar(
-              radius: 60,
-              backgroundImage: AssetImage('assets/man.jpg'),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: AssetImage(
+                        'assets/man.jpg'), // Consider using a network image if available
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    riderData['name'] ?? 'Name not available',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('Active since: ${_formatDate(riderData['createdAt'])}'),
+                  const SizedBox(height: 24),
+                  _buildInfoCard(
+                      'Phone', riderData['phone'] ?? 'Not available'),
+                  _buildInfoCard(
+                      'Email', riderData['email'] ?? 'Not available'),
+                  _buildInfoCard('Vehicle Type',
+                      riderData['vehicle_type'] ?? 'Not available'),
+                  _buildInfoCard('License Number',
+                      riderData['lincenseNumber'] ?? 'Not available'),
+                  _buildInfoCard('Vehicle Number',
+                      riderData['vehicleNumber'] ?? 'Not available'),
+                  _buildInfoCard(
+                      'Availability',
+                      riderData['availability']
+                          ? 'Available'
+                          : 'Not Available'),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Chris Johnson',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text('Active since: January 2023'),
-            const SizedBox(height: 24),
-            _buildInfoCard('Phone', '+1 234 567 8900'),
-            _buildInfoCard('Email', 'chris.johnson@example.com'),
-            _buildInfoCard('Vehicle', 'Toyota Corolla'),
-            _buildInfoCard('License Plate', 'ABC 123'),
-          ],
-        ),
-      ),
     );
   }
 
@@ -53,21 +109,44 @@ class DeliveryProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+  String _formatDate(String? dateString) {
+    if (dateString == null) return 'Date not available';
+    DateTime date = DateTime.parse(dateString);
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }
 
 class EditProfileScreen extends StatefulWidget {
+  final Map<String, dynamic> riderData;
+
+  EditProfileScreen({required this.riderData});
+
   @override
   _EditProfileScreenState createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  // Add controllers for each editable field
-  final _nameController = TextEditingController(text: 'Chris Johnson');
-  final _phoneController = TextEditingController(text: '+1 234 567 8900');
-  final _emailController =
-      TextEditingController(text: 'chris.johnson@example.com');
-  final _vehicleController = TextEditingController(text: 'Toyota Corolla');
-  final _licensePlateController = TextEditingController(text: 'ABC 123');
+  late TextEditingController _nameController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
+  late TextEditingController _vehicleTypeController;
+  late TextEditingController _licenseNumberController;
+  late TextEditingController _vehicleNumberController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.riderData['name']);
+    _phoneController = TextEditingController(text: widget.riderData['phone']);
+    _emailController = TextEditingController(text: widget.riderData['email']);
+    _vehicleTypeController =
+        TextEditingController(text: widget.riderData['vehicle_type']);
+    _licenseNumberController =
+        TextEditingController(text: widget.riderData['lincenseNumber']);
+    _vehicleNumberController =
+        TextEditingController(text: widget.riderData['vehicleNumber']);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,12 +169,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextFormField(
-              controller: _vehicleController,
-              decoration: const InputDecoration(labelText: 'Vehicle'),
+              controller: _vehicleTypeController,
+              decoration: const InputDecoration(labelText: 'Vehicle Type'),
             ),
             TextFormField(
-              controller: _licensePlateController,
-              decoration: const InputDecoration(labelText: 'License Plate'),
+              controller: _licenseNumberController,
+              decoration: const InputDecoration(labelText: 'License Number'),
+            ),
+            TextFormField(
+              controller: _vehicleNumberController,
+              decoration: const InputDecoration(labelText: 'Vehicle Number'),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -116,8 +199,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _nameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _vehicleController.dispose();
-    _licensePlateController.dispose();
+    _vehicleTypeController.dispose();
+    _licenseNumberController.dispose();
+    _vehicleNumberController.dispose();
     super.dispose();
   }
 }

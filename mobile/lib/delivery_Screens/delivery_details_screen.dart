@@ -9,6 +9,7 @@ class DeliveryDetailsScreen extends StatelessWidget {
   DeliveryDetailsScreen({
     required this.restaurant,
     required this.customer,
+    required Map<String, dynamic> order,
     // Add other required parameters
   });
 

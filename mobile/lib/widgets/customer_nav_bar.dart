@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile/screens/cart_screen.dart';
 import 'package:mobile/screens/favorite_screen.dart';
 import 'package:mobile/screens/home_screen.dart';
+import 'package:mobile/screens/order_history_screen.dart';
 import 'package:mobile/screens/search_screen.dart';
+import 'package:mobile/screens/user_profile_screen.dart';
 
 class CustomerBottomNavBar extends StatefulWidget {
   CustomerBottomNavBar({Key? key}) : super(key: key);
@@ -36,8 +38,9 @@ class _CustomerBottomNavBarState extends State<CustomerBottomNavBar> {
           HomePage(),
           // AboutContactScreen(),
           CuisinesScreen(),
-          FavouriteScreen(),
-          CartScreen()
+          const FavouriteScreen(),
+          const CartScreen(),
+          OrderHistoryScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -72,6 +75,10 @@ class _CustomerBottomNavBarState extends State<CustomerBottomNavBar> {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
           ),
         ],
       ),

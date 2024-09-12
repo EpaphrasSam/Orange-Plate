@@ -6,6 +6,7 @@ import 'dart:convert'; // Import JSON codec
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared preferences
 import 'package:mobile/services/endpoints.dart'; // Import endpoints
 import 'forget_password_screen.dart'; // Import the new screen
+import 'package:mobile/delivery_Screens/delivery_home_screen.dart'; // Import DeliveryHomeScreen
 
 class OrangePlateLogin extends StatefulWidget {
   @override
@@ -19,19 +20,54 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _passwordVisible = false;
+  String _selectedRole = 'customer'; // Default role
+  bool _isButtonEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _checkLoginStatus(); // Check login status on app start
+    emailController.addListener(_updateButtonState);
+    passwordController.addListener(_updateButtonState);
+  }
+
+  @override
+  void dispose() {
+    emailController.removeListener(_updateButtonState);
+    passwordController.removeListener(_updateButtonState);
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = _isValidEmail(emailController.text) &&
+          passwordController.text.isNotEmpty;
+    });
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
 
   // Function to check if the user is already logged in
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('userToken');
-    if (token != null) {
-      // Navigate to the main screen if the user is already logged in
+    String? role = prefs.getString('userRole');
+    if (token != null && role != null) {
+      _navigateBasedOnRole(role);
+    }
+  }
+
+  void _navigateBasedOnRole(String role) {
+    if (role == 'rider') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DeliveryHomeScreen()),
+      );
+    } else {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => CustomerBottomNavBar()),
@@ -41,14 +77,22 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
 
   // Function to handle user login
   Future<void> loginUser(
-      BuildContext context, String email, String password) async {
+      BuildContext context, String email, String password, String role) async {
     setState(() {
       _isLoading = true; // Start loading
     });
     try {
+      // Print the URL and body
+      print('Login URL: $loginUrl');
+      print('Request body: ${jsonEncode({
+            'email': email,
+            'password': password,
+            'role': role
+          })}');
+
       var response = await http.post(
         Uri.parse(loginUrl),
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'email': email, 'password': password, 'role': role}),
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 200) {
@@ -62,11 +106,9 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
           await prefs.setString(
               'userId', data['loggedInUser']['id']); // Store the user ID
           await prefs.setString('userToken', data['token']); // Store the token
-          // Handle successful login
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => CustomerBottomNavBar()),
-          );
+          await prefs.setString('userRole', role); // Store the user role
+
+          _navigateBasedOnRole(role);
         } else {
           throw Exception('Invalid response data');
         }
@@ -75,7 +117,7 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
             'Failed to login with status code ${response.statusCode}');
       }
     } catch (e) {
-      print(e.toString());
+      print('Login error: ${e.toString()}');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login error: ${e.toString()}')),
@@ -97,7 +139,7 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'assets/background.jpg'), // Ensure you have this image in your assets
+                    'assets/home.png'), // Ensure you have this image in your assets
                 fit: BoxFit.cover,
               ),
             ),
@@ -138,6 +180,7 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                       ),
+                      keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 10),
                     // Password TextField
@@ -163,14 +206,45 @@ class _OrangePlateLoginState extends State<OrangePlateLogin> {
                       ),
                     ),
                     const SizedBox(height: 20),
+                    // Role selection
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Radio<String>(
+                          value: 'customer',
+                          groupValue: _selectedRole,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRole = value!;
+                            });
+                          },
+                        ),
+                        Text('Customer'),
+                        Radio<String>(
+                          value: 'rider',
+                          groupValue: _selectedRole,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedRole = value!;
+                            });
+                          },
+                        ),
+                        Text('Rider'),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
                     // Sign In Button
                     ElevatedButton(
-                      onPressed: _isLoading
-                          ? null
-                          : () {
-                              loginUser(context, emailController.text,
-                                  passwordController.text);
-                            },
+                      onPressed: (_isButtonEnabled && !_isLoading)
+                          ? () {
+                              loginUser(
+                                context,
+                                emailController.text,
+                                passwordController.text,
+                                _selectedRole,
+                              );
+                            }
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(

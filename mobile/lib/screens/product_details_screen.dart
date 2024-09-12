@@ -16,14 +16,14 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   final ApiService apiService = ApiService();
   bool _isAddingToCart = false;
-
+  int quantity = 1;
   Future<void> _addToCart(BuildContext context) async {
     setState(() {
       _isAddingToCart = true;
     });
 
     try {
-      await apiService.addToCart(widget.product.id, 1);
+      await apiService.addToCart(widget.product.id, quantity);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
@@ -58,61 +58,74 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.product.name),
+        title: Text('What\'s in ${widget.product.name} menu'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 250, // Adjust this value as needed
-              child: CachedNetworkImage(
-                cacheKey: widget.product.imagePath,
-                imageUrl: widget.product.imagePath,
-                placeholder: (context, url) => Image.asset(placeHolderPath),
-                errorWidget: (context, url, error) =>
-                    Image.asset(placeHolderPath),
-                fit: BoxFit.cover,
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Hero(
+              tag: 'product_image_${widget.product.id}',
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: CachedNetworkImage(
+                  cacheKey: widget.product.image ?? '',
+                  imageUrl: widget.product.image ?? '',
+                  placeholder: (context, url) => Image.asset(placeHolderPath),
+                  errorWidget: (context, url, error) =>
+                      Image.asset(placeHolderPath),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.product.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    widget.product.description,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildInfoItem(context, 'Ready in', '20min'),
-                      _buildInfoItem(context, 'Ingredients', '8 needed'),
-                      _buildInfoItem(context, 'Serves', '1-2 person'),
-                    ],
-                  ),
-                ],
-              ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(16.0),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Text(
+                  widget.product.name,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange,
+                      ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.product.description,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildInfoItem(context, 'Ready in', '20min', Icons.timer),
+                    _buildInfoItem(
+                        context, 'Ingredients', '8 needed', Icons.restaurant),
+                    _buildInfoItem(
+                        context, 'Serves', '1-2 person', Icons.people),
+                  ],
+                ),
+              ]),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, -3),
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -137,7 +150,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               onPressed: _isAddingToCart ? null : () => _addToCart(context),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 backgroundColor: Colors.orange,
                 padding:
@@ -161,19 +174,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildInfoItem(BuildContext context, String title, String value) {
+  Widget _buildInfoItem(
+      BuildContext context, String title, String value, IconData icon) {
     return Column(
       children: [
+        Icon(icon, color: Colors.orange),
+        const SizedBox(height: 8),
         Text(
           title,
-          style: Theme.of(context).textTheme.bodySmall,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Colors.grey[600],
+              ),
         ),
         Text(
           value,
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall
-              ?.copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
         ),
       ],
     );

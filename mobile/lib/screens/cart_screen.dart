@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/constants/file_path.dart';
 // imp:mobile/models/cart_model.dart';
 import 'package:mobile/services/api_services.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../models/cart_model.dart';
 
@@ -38,8 +39,18 @@ class _CartScreenState extends State<CartScreen> {
       final fetchedProducts = await apiService.fetchCartItems();
       print("Fetched ${fetchedProducts.length} items"); // Debug print
 
+      // Group items by menuItemId
+      Map<String, CartProduct> groupedProducts = {};
+      for (var product in fetchedProducts) {
+        if (groupedProducts.containsKey(product.menuItemId)) {
+          groupedProducts[product.menuItemId]!.quantity += product.quantity;
+        } else {
+          groupedProducts[product.menuItemId] = product;
+        }
+      }
+
       setState(() {
-        cartProducts = fetchedProducts;
+        cartProducts = groupedProducts.values.toList();
         isLoading = false;
       });
     } catch (e) {
@@ -211,8 +222,14 @@ class _CartScreenState extends State<CartScreen> {
           .map((item) => item.id)
           .toList();
 
+      // Get the user's current location
+      Position position = await _determinePosition();
+      double customerLatitude = position.latitude;
+      double customerLongitude = position.longitude;
+
       final apiService = ApiService();
-      await apiService.checkout(total, restaurantId, cartItemIds);
+      await apiService.checkout(total, restaurantId, cartItemIds,
+          customerLatitude, customerLongitude);
 
       // Clear the cart items after successful order placement
       setState(() {
@@ -230,9 +247,6 @@ class _CartScreenState extends State<CartScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-
-      // Optionally, you can call an API to clear the cart on the server
-      // await apiService.clearCart();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -250,6 +264,31 @@ class _CartScreenState extends State<CartScreen> {
         isPlacingOrder = false;
       });
     }
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   bool get areAllItemsSelected =>
@@ -535,12 +574,6 @@ class _CartScreenState extends State<CartScreen> {
                                       )
                                     : const Text('Checkout'),
                               ),
-                              // TextButton(
-                              //   onPressed: () {
-                              //     // Handle add more food action
-                              //   },
-                              //   child: const Text('Add More Food'),
-                              // ),
                             ],
                           ),
                         ),
@@ -594,8 +627,8 @@ class _CartProductCardState extends State<CartProductCard> {
             height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                const BoxShadow(
+              boxShadow: const [
+                BoxShadow(
                   color: Colors.white,
                   spreadRadius: 1,
                   blurRadius: 3,
@@ -620,23 +653,23 @@ class _CartProductCardState extends State<CartProductCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.product.menuItem.name,
+                  widget.product.menuItem.name.toUpperCase(),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                // const SizedBox(height: 5),
+                // Text(
+                //   widget.product.menuItem.description,
+                //   style: TextStyle(
+                //     fontSize: 14,
+                //     color: Colors.grey[600],
+                //   ),
+                // ),
                 const SizedBox(height: 5),
                 Text(
-                  widget.product.menuItem.description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  widget.product.menuItem.price.toString(),
+                  '₵${widget.product.menuItem.price.toString()}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,

@@ -25,6 +25,38 @@ class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
 
   bool _passwordVisible = false;
   bool _isLoading = false;
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    emailController.addListener(_updateButtonState);
+    passwordController.addListener(_updateButtonState);
+    nameController.addListener(_updateButtonState);
+    phoneController.addListener(_updateButtonState);
+  }
+
+  @override
+  void dispose() {
+    emailController.removeListener(_updateButtonState);
+    passwordController.removeListener(_updateButtonState);
+    nameController.removeListener(_updateButtonState);
+    phoneController.removeListener(_updateButtonState);
+    super.dispose();
+  }
+
+  void _updateButtonState() {
+    setState(() {
+      _isButtonEnabled = _isValidEmail(emailController.text) &&
+          passwordController.text.isNotEmpty &&
+          nameController.text.isNotEmpty &&
+          phoneController.text.isNotEmpty;
+    });
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
 
   void registerUser(BuildContext context) async {
     setState(() {
@@ -60,8 +92,13 @@ class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
       print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text(
+            'Error: ${e.toString()}',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white),
+          ),
           backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -84,7 +121,7 @@ class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
             decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'assets/background.jpg'), // Ensure you have this image in your assets
+                    'assets/home.png'), // Ensure you have this image in your assets
                 fit: BoxFit.cover,
               ),
             ),
@@ -205,8 +242,9 @@ class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
 
                     // Register Button
                     ElevatedButton(
-                      onPressed: () => registerUser(
-                          context), // Use the registerUser function with context
+                      onPressed: (_isButtonEnabled && !_isLoading)
+                          ? () => registerUser(context)
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange,
                         shape: RoundedRectangleBorder(
@@ -215,7 +253,17 @@ class _OrangePlateSignUpState extends State<OrangePlateSignUp> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50, vertical: 15),
                       ),
-                      child: const Text('Register'),
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.0,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text('Register'),
                     ),
                     const SizedBox(height: 10),
                     // Sign In Link

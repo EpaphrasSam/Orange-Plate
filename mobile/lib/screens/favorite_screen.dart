@@ -121,7 +121,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : favoriteList.items.isEmpty
-              ? Center(
+              ? const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

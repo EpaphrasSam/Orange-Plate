@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile/constants/file_path.dart';
 import 'package:mobile/functions/logout_func.dart';
 import 'package:mobile/models/models.dart';
-import 'package:mobile/models/models.dart';
-import 'package:mobile/models/models.dart';
 import 'package:mobile/services/api_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +11,10 @@ import 'dart:convert'; // Import JSON codec
 import 'package:http/http.dart' as http; // Import HTTP package
 import 'package:mobile/screens/product_details_screen.dart';
 import 'package:mobile/models/favorite_model.dart';
+import 'package:mobile/services/order_update_service.dart';
+import 'package:mobile/screens/category_details_screen.dart'; // Create this file
+import 'package:mobile/screens/restaurant_details_screen.dart'; // Create this file
+import 'package:mobile/models/models.dart' show CategoryModel;
 
 class HomePage extends StatefulWidget {
   @override
@@ -21,16 +23,39 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<ProductModel> products = [];
+  List<CategoryModel> categories = [];
+  List<RestaurantModel> restaurants = [];
   bool isLoading = false;
+  bool isCategoriesLoading = true; // New loading state for categories
+  late OrderUpdateService _orderUpdateService;
+  List<Map<String, dynamic>> rawCategories = [];
+  bool isRestaurantsLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _checkLocationServicesAndFetchProducts(); // Check location services and fetch products
-    printStoredUserData(); // Print stored user data
+    _orderUpdateService = OrderUpdateService();
+    _initializeOrderUpdates();
+    _checkLocationServicesAndFetchData();
+    fetchCategories();
+    printStoredUserData();
+    fetchRestaurants();
   }
 
-  void _checkLocationServicesAndFetchProducts() async {
+  void _initializeOrderUpdates() async {
+    // await _orderUpdateService.initializeWebSocket();
+    _orderUpdateService.setOrderUpdateCallback(_handleOrderUpdate);
+  }
+
+  void _handleOrderUpdate(dynamic message) {
+    // Handle the order update here
+    // You might want to parse the message and update your UI
+    setState(() {
+      // Update your UI based on the order status
+    });
+  }
+
+  void _checkLocationServicesAndFetchData() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       _showLocationServicesDialog();
@@ -51,7 +76,8 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
-    fetchProducts(); // Fetch products when location services are enabled and permissions are granted
+    fetchData();
+    print('Raw Categories: $rawCategories');
   }
 
   void _showLocationServicesDialog() {
@@ -98,7 +124,30 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void fetchProducts() async {
+  Future<void> fetchCategories() async {
+    setState(() {
+      isCategoriesLoading = true;
+    });
+
+    try {
+      var apiService = ApiService();
+      List<CategoryModel> fetchedCategories =
+          await apiService.fetchCategories();
+
+      setState(() {
+        categories = fetchedCategories;
+        isCategoriesLoading = false;
+      });
+    } catch (e) {
+      print('Failed to fetch categories: $e');
+      setState(() {
+        isCategoriesLoading = false;
+      });
+    }
+  }
+
+  // Modify the existing fetchData method
+  void fetchData() async {
     setState(() {
       isLoading = true;
     });
@@ -107,79 +156,26 @@ class _HomePageState extends State<HomePage> {
     double latitude = position.latitude;
     double longitude = position.longitude;
 
-    print('Coordinates: Latitude = $latitude, Longitude = $longitude');
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('userToken');
-
-    if (token == null) {
-      print('Error: No token found');
-      return;
-    }
-
-    print('Retrieved Token: $token');
-
     try {
-      var response = await http.post(
-        Uri.parse(getNearbyRestaurantsMenuItemsUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token,
-        },
-        body: jsonEncode({
-          'latitude': latitude,
-          'longitude': longitude,
-        }),
-      );
+      var apiService = ApiService();
+      var responseData = await apiService.fetchProducts(latitude, longitude);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      setState(() {
+        restaurants = (responseData['restaurantsWithoutMenuItems'] as List?)
+                ?.map((item) => RestaurantModel.fromJson(item))
+                .toList() ??
+            [];
+        products = (responseData['menuItems'] as List?)
+                ?.map((item) => ProductModel.fromJson(item))
+                .toList() ??
+            [];
+        isLoading = false;
+      });
 
-      if (response.statusCode == 200) {
-        var responseData = jsonDecode(response.body);
-        print('Response data: $responseData');
-
-        if (responseData != null && responseData['menuItems'] is List) {
-          List<dynamic> menuItems = responseData['menuItems'];
-          List<ProductModel> fetchedProducts = [];
-
-          for (var restaurantMenu in menuItems) {
-            if (restaurantMenu is List) {
-              for (var item in restaurantMenu) {
-                if (item is Map<String, dynamic>) {
-                  try {
-                    fetchedProducts.add(ProductModel.fromJson(item));
-                  } catch (e) {
-                    print('Error parsing product: $e');
-                    print('Problematic item: $item');
-                  }
-                } else {
-                  print('Unexpected item type: ${item.runtimeType}');
-                }
-              }
-            } else {
-              print(
-                  'Unexpected restaurant menu type: ${restaurantMenu.runtimeType}');
-            }
-          }
-
-          setState(() {
-            products = fetchedProducts;
-            print('Number of products: ${products.length}');
-            print(
-                'First product: ${products.isNotEmpty ? products.first : "No products"}');
-          });
-        } else {
-          print('Error: menuItems are not of type List');
-          print('menuItems type: ${responseData['menuItems'].runtimeType}');
-        }
-      } else {
-        print(
-            'Failed to fetch products with status code ${response.statusCode}');
-      }
+      print('Restaurants: $restaurants');
+      print('Products: $products');
     } catch (e) {
-      print('Failed to fetch products: $e');
-    } finally {
+      print('Failed to fetch data: $e');
       setState(() {
         isLoading = false;
       });
@@ -198,6 +194,27 @@ class _HomePageState extends State<HomePage> {
     print('Stored User Token: $storedUserToken');
   }
 
+  Future<void> fetchRestaurants() async {
+    setState(() {
+      isRestaurantsLoading = true;
+    });
+    try {
+      restaurants = await ApiService().fetchAllRestaurantsWithMenuItems();
+      setState(() {
+        isRestaurantsLoading = false;
+      });
+      // Debug print
+      for (var restaurant in restaurants) {
+        print('${restaurant.name}: ${restaurant.menuItems.length} menu items');
+      }
+    } catch (e) {
+      print('Failed to fetch restaurants: $e');
+      setState(() {
+        isRestaurantsLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -211,7 +228,7 @@ class _HomePageState extends State<HomePage> {
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Hello, Chris!'),
+            Text('Hello, Customer!'),
           ],
         ),
         actions: [
@@ -242,44 +259,98 @@ class _HomePageState extends State<HomePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
                   image: const DecorationImage(
-                    image: AssetImage(
-                        'assets/burger.jpg'), // Replace with your image
-                    fit: BoxFit.cover, // Changed to cover for a better fit
+                    image: AssetImage('assets/burger.jpg'),
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
 
             // Categories
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CategoryIcon(icon: Icons.star, label: 'Popular'),
-                  CategoryIcon(icon: Icons.local_pizza, label: 'Western'),
-                  CategoryIcon(icon: Icons.local_drink, label: 'Drinks'),
-                  CategoryIcon(icon: Icons.restaurant, label: 'Local'),
-                ],
-              ),
-            ),
-            // Cuisines Section
-            // Removed Cuisines Section
-
-            // Products Section
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Products',
+                  const Text('Categories',
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
                   const SizedBox(height: 8),
-                  if (isLoading)
+                  if (isCategoriesLoading)
                     const Center(child: CircularProgressIndicator())
-                  else if (products.isEmpty)
-                    const Center(child: Text('No products available'))
+                  else if (categories.isEmpty)
+                    const Center(child: Text('No categories available'))
+                  else
+                    SizedBox(
+                      height: 90,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: categories.length,
+                        itemBuilder: (context, index) {
+                          final category = categories[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CategoryDetailsScreen(category: category),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 70,
+                              margin: const EdgeInsets.only(right: 10),
+                              child: Column(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: CachedNetworkImage(
+                                      imageUrl: category.image,
+                                      placeholder: (context, url) =>
+                                          Image.asset(placeHolderPath),
+                                      errorWidget: (context, url, error) =>
+                                          Image.asset(placeHolderPath),
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Expanded(
+                                    child: Text(
+                                      category.name,
+                                      style: TextStyle(fontSize: 11),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Restaurants
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Restaurants Near You',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                  const SizedBox(height: 8),
+                  if (isRestaurantsLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (restaurants.isEmpty)
+                    const Center(child: Text('No restaurants available'))
                   else
                     GridView.builder(
                       shrinkWrap: true,
@@ -287,7 +358,44 @@ class _HomePageState extends State<HomePage> {
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.7, // Adjusted for better fit
+                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                      ),
+                      itemCount: restaurants.length,
+                      itemBuilder: (context, index) {
+                        return RestaurantCard(
+                          restaurant: restaurants[index],
+                        );
+                      },
+                    ),
+                ],
+              ),
+            ),
+
+            // Products Section
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Menu Items Near You',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                  const SizedBox(height: 8),
+                  if (isLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else if (products.isEmpty)
+                    const Center(
+                        child: Text('No menu items available near you'))
+                  else
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 0.7,
                         crossAxisSpacing: 10,
                         mainAxisSpacing: 10,
                       ),
@@ -304,32 +412,114 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _orderUpdateService.dispose();
+    super.dispose();
+  }
 }
 
 class CategoryIcon extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String imageUrl;
 
-  const CategoryIcon({required this.icon, required this.label});
+  const CategoryIcon(
+      {required this.icon, required this.label, required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            border:
-                Border.all(color: Colors.orange, width: 2), // Circular border
-            shape: BoxShape.circle,
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          child: Icon(icon, size: 32, color: Colors.orange),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
+
+class RestaurantCard extends StatelessWidget {
+  final RestaurantModel restaurant;
+
+  const RestaurantCard({
+    Key? key,
+    required this.restaurant,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RestaurantDetailsScreen(
+              restaurant: restaurant,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: CachedNetworkImage(
+                  imageUrl: restaurant.image.toString(),
+                  placeholder: (context, url) =>
+                      Image.asset(restaurantPlaceholderPath),
+                  errorWidget: (context, url, error) =>
+                      Image.asset(restaurantPlaceholderPath),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    restaurant.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    restaurant.address,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(label,
-            style: const TextStyle(fontWeight: FontWeight.bold)), // Label text
-      ],
+      ),
     );
   }
 }
@@ -350,7 +540,7 @@ class _ProductCardState extends State<ProductCard> {
   @override
   void initState() {
     super.initState();
-    favoriteList = FavoriteList(items: []); // Initialize with an empty list
+    favoriteList = FavoriteList(items: []);
     _checkFavoriteStatus();
   }
 
@@ -378,12 +568,12 @@ class _ProductCardState extends State<ProductCard> {
             id: widget.product.id,
             name: widget.product.name,
             price: widget.product.price,
-            option: widget.product.imagePath,
+            option: widget.product.image ?? '',
             description: widget.product.description,
             available: true,
             createdAt: DateTime.now().toIso8601String(),
-            restaurantId: '',
-            categoryId: '',
+            restaurantId: widget.product.restaurantId,
+            categoryId: widget.product.categoryId,
           ),
         ));
       }
@@ -395,30 +585,31 @@ class _ProductCardState extends State<ProductCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailsScreen(product: widget.product),
-                    ),
-                  );
-                },
-                child: ClipRRect(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(
+              product: widget.product,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                ClipRRect(
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(16)),
                   child: CachedNetworkImage(
-                    cacheKey: widget.product.imagePath,
-                    imageUrl: widget.product.imagePath,
+                    cacheKey: widget.product.image ?? '',
+                    imageUrl: widget.product.image ?? '',
                     placeholder: (context, url) => Image.asset(placeHolderPath),
                     errorWidget: (context, url, error) =>
                         Image.asset(placeHolderPath),
@@ -427,108 +618,56 @@ class _ProductCardState extends State<ProductCard> {
                     width: double.infinity,
                   ),
                 ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: GestureDetector(
-                  onTap: _toggleFavorite,
-                  child: Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorite ? Colors.red : Colors.grey,
-                    size: 28,
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: _toggleFavorite,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ProductDetailsScreen(product: widget.product)),
-              );
-            },
-            child: Padding(
+              ],
+            ),
+            Padding(
               padding: const EdgeInsets.all(12),
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.product.name.toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.product.name.toUpperCase(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\GH₵${widget.product.price.toStringAsFixed(2)}',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '\GH₵${widget.product.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
-
-// class ProductModel {
-//   final String id;
-//   final String name;
-//   final double price;
-//   final String option;
-//   final String description;
-//   final bool available;
-//   final String createdAt;
-//   final String restaurantId;
-//   final String categoryId;
-//   final String imagePath;
-//   final bool isFavorite;
-
-//   ProductModel({
-//     required this.id,
-//     required this.name,
-//     required this.price,
-//     required this.option,
-//     required this.description,
-//     required this.available,
-//     required this.createdAt,
-//     required this.restaurantId,
-//     required this.categoryId,
-//     required this.imagePath,
-//     required this.isFavorite,
-//   });
-
-//   factory ProductModel.fromJson(Map<String, dynamic> json) {
-//     return ProductModel(
-//       id: json['id'] as String? ?? '',
-//       name: json['name'] as String? ?? '',
-//       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-//       option: json['option'] as String? ?? '',
-//       description: json['description'] as String? ?? '',
-//       available: json['available'] as bool? ?? false,
-//       createdAt: json['createdAt'] as String? ?? '',
-//       restaurantId: json['restaurantId'] as String? ?? '',
-//       categoryId: json['categoryId'] as String? ?? '',
-//       imagePath: json['imagePath'] as String? ?? 'assets/default_image.png',
-//       isFavorite: json['isFavorite'] as bool? ?? false,
-//     );
-//   }
-// }
-
-final products = []; // Removed hardcoded products
