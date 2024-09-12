@@ -157,10 +157,9 @@ export const getRiderStatistics = async (
       (order) => order.status === "delivered"
     );
     const totalSuccessfulDeliveries = deliveredOrders.length;
-    const totalEarnings = deliveredOrders.reduce(
-      (acc, order) => acc + (order.deliveryFee || 0),
-      0
-    );
+    const totalEarnings = deliveredOrders
+      .reduce((acc, order) => acc + (order.deliveryFee || 0), 0)
+      .toFixed(2);
     const weeklyEarnings = riderOrders.reduce((acc, order) => {
       const orderDate = new Date(order.deliveryTime || "");
       const currentDate = new Date();
@@ -175,13 +174,13 @@ export const getRiderStatistics = async (
     }, Array(7).fill(0));
 
     const dailyEarnings = {
-      Sunday: weeklyEarnings[0],
-      Monday: weeklyEarnings[1],
-      Tuesday: weeklyEarnings[2],
-      Wednesday: weeklyEarnings[3],
-      Thursday: weeklyEarnings[4],
-      Friday: weeklyEarnings[5],
-      Saturday: weeklyEarnings[6],
+      Sunday: weeklyEarnings[0].toFixed(2),
+      Monday: weeklyEarnings[1].toFixed(2),
+      Tuesday: weeklyEarnings[2].toFixed(2),
+      Wednesday: weeklyEarnings[3].toFixed(2),
+      Thursday: weeklyEarnings[4].toFixed(2),
+      Friday: weeklyEarnings[5].toFixed(2),
+      Saturday: weeklyEarnings[6].toFixed(2),
     };
 
     res.status(200).json({
