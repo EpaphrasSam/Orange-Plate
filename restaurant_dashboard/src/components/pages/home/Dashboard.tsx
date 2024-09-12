@@ -25,16 +25,12 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import {
-  FiTrendingUp,
-  FiUsers,
-  FiShoppingCart,
-  FiDollarSign,
-} from "react-icons/fi";
+import { FiTrendingUp, FiUsers, FiShoppingCart } from "react-icons/fi";
+import { FaCediSign } from "react-icons/fa6";
 import { OrderStatus } from "@/types/orderType";
 
 const iconMap = {
-  FiDollarSign,
+  FaCediSign,
   FiShoppingCart,
   FiTrendingUp,
   FiUsers,

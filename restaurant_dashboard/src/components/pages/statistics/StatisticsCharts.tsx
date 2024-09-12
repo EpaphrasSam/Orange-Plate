@@ -21,9 +21,8 @@ import {
   FiShoppingCart,
   FiUsers,
   FiTrendingUp,
-  FiDollarSign,
 } from "react-icons/fi";
-
+import { FaCediSign } from "react-icons/fa6";
 interface StatisticsChartsProps {
   data: {
     summary: Array<{ title: string; value: string | number; icon: string }>;
@@ -71,8 +70,8 @@ const StatisticsCharts: React.FC<StatisticsChartsProps> = ({ data }) => {
                 <h3 className="text-2xl font-bold">{item.value}</h3>
               </div>
               <div className="bg-yellow-100 p-3 rounded-full">
-                {item.icon === "FiDollarSign" && (
-                  <FiDollarSign className="text-[#FCAF01] text-xl" />
+                {item.icon === "FaCediSign" && (
+                  <FaCediSign className="text-[#FCAF01] text-xl" />
                 )}
                 {item.icon === "FiShoppingCart" && (
                   <FiShoppingCart className="text-[#00FF00] text-xl" />

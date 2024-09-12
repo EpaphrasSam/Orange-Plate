@@ -3,7 +3,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import RestaurantProfile from "./RestaurantProfile";
-import PaymentSettings from "./PaymentSettings";
 import PasswordChange from "./PasswordChange";
 import { Button, Divider } from "@nextui-org/react";
 
@@ -22,17 +21,6 @@ const Settings = () => {
       >
         <h2 className="text-2xl font-bold mb-4">Restaurant Profile</h2>
         <RestaurantProfile />
-      </motion.div>
-
-      <Divider className="my-6" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <h2 className="text-2xl font-bold mb-4">Payment</h2>
-        <PaymentSettings />
       </motion.div>
 
       <Divider className="my-6" />

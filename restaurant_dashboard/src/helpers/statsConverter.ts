@@ -17,7 +17,7 @@ export function processOrderData(orders: Order[]): DashboardData {
     {
       title: "Total Revenue",
       value: totalRevenue.toFixed(2),
-      icon: "FiDollarSign",
+      icon: "FaCediSign",
     },
     { title: "Total Customers", value: uniqueCustomers, icon: "FiUsers" },
     {
@@ -94,7 +94,7 @@ export function processStatisticsData(orders: Order[]) {
       {
         title: "Total Revenue",
         value: totalRevenue.toFixed(2),
-        icon: "FiDollarSign",
+        icon: "FaCediSign",
       },
       { title: "Total Orders", value: totalOrders, icon: "FiShoppingCart" },
       {

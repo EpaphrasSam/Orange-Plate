@@ -45,4 +45,10 @@ export interface Order {
       categoryId: string;
     };
   }[];
+  Rider: {
+    id: string;
+    name: string;
+    latitude: string;
+    longitude: string;
+  } | null;
 }

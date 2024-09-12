@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
-  Circle,
   Marker,
   Popup,
   Polyline,
@@ -45,10 +44,10 @@ L.Icon.Default.mergeOptions({
 
 const DeliveryMap = ({
   deliveries,
-  radius,
+  restaurantPosition,
 }: {
   deliveries: any[];
-  radius: number;
+  restaurantPosition: LatLngExpression;
 }) => {
   const [center, setCenter] = useState<LatLngExpression>([6.700071, -1.630783]);
 
@@ -172,9 +171,7 @@ const DeliveryMap = ({
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <Circle center={center} radius={radius * 1000} />
-
-        <Marker position={center} icon={customIconRestaurant}>
+        <Marker position={restaurantPosition} icon={customIconRestaurant}>
           <Popup>Restaurant Location</Popup>
         </Marker>
 

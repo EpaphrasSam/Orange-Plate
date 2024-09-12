@@ -20,15 +20,15 @@ const DeliveryMetrics = ({ metrics }: { metrics: any }) => {
     },
     {
       key: "completedDeliveries",
-      title: "Completed Today",
+      title: "Completed Deliveries",
       icon: FiCheckCircle,
       color: "text-purple-500",
     },
     {
-      key: "delayedDeliveries",
-      title: "Delayed Deliveries",
+      key: "ordersLookingForRider",
+      title: "Orders Looking for Rider",
       icon: FiAlertCircle,
-      color: "text-red-500",
+      color: "text-orange-500",
     },
   ];
 
