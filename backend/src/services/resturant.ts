@@ -58,23 +58,41 @@ export const getRestaurantById = async (restaurantId: string) => {
 };
 
 //create password
-export const createPassword = async (email: string, password: string) => {
+export const changePassword = async (
+  restaurantId: string,
+  oldPassword: string,
+  newPassword: string
+) => {
   try {
-    const hashedPassword = await bcrypt.hashPassword(password);
+    //check if old password is correct
+    const restaurant = await prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+    });
+    if (!restaurant) {
+      throw new CustomError("Restaurant not found", 404);
+    }
+    //if restaurant has no password
+    if (restaurant.password === null) {
+      throw new CustomError("Password not set for this restaurant", 400);
+    }
+    const isPasswordValid = await bcrypt.verifyPassword(
+      oldPassword,
+      restaurant.password
+    );
+    if (!isPasswordValid) {
+      throw new CustomError("Invalid old password", 400);
+    }
+    const hashedPassword = await bcrypt.hashPassword(newPassword);
     const updatedRestaurant = await prisma.restaurant.update({
-      where: { email: email },
+      where: { id: restaurantId },
       data: { password: hashedPassword },
     });
-    const token = await jwt.generateToken({
-      id: updatedRestaurant.id,
-      name: updatedRestaurant.name,
-    });
-    return { token, updatedRestaurant };
+    return updatedRestaurant;
   } catch (err: any) {
     if (err instanceof PrismaClientKnownRequestError) {
-      //if email is not found
+      //if restaurant is not found
       if (err.code === "P2025") {
-        throw new CustomError("Restaurant nof found: check email", 404);
+        throw new CustomError("Restaurant not found", 404);
       }
       throw new CustomError(`Prisma error '${err.code}' occured`, 501);
     }

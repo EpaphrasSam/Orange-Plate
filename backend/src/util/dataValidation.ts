@@ -33,23 +33,30 @@ export const createCategoryData = async (
 };
 
 //create password dataValidation
-export const validateCreatePasswordData = async (
-  email: string,
-  password: string
+export const validateChangePasswordData = async (
+  restaurantId: string,
+  oldPassword: string,
+  newPassword: string
 ) => {
   try {
-    const emailFormat = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gi;
-    //check if email and password are not empty
-    if (!email || !password) {
-      throw new CustomError("Email and password are required", 422);
+    if (!restaurantId) {
+      throw new CustomError(
+        "Restaurant id is required: pass id as request parameter",
+        422
+      );
     }
-    //check if email is valid
-    if (!email.match(emailFormat)) {
-      throw new CustomError("Invalid email address", 422);
+    if (typeof restaurantId !== "string") {
+      throw new CustomError("Restaurant id must be of type string", 422);
     }
-    //check if password is at least 8 characters long
-    if (password.length < 8) {
-      throw new CustomError("Password must be at least 8 characters long", 422);
+    //check if old and new password are not empty
+    if (!oldPassword || !newPassword) {
+      throw new CustomError("Old and new passwords are required", 422);
+    }
+    if (typeof oldPassword !== "string" || typeof newPassword !== "string") {
+      throw new CustomError(
+        "Old and new passwords must be of type string",
+        422
+      );
     }
   } catch (err: any) {
     throw new CustomError(err.message, err.statusCode);

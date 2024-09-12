@@ -41,20 +41,31 @@ export const getRestaurantById = async (
 };
 
 //create password
-export const createPassword = async (
+export const changePassword = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
+  const restaurantId: string = req.params.id;
+  const token: any = req.headers.authorization;
+  const {
+    oldPassword,
+    newPassword,
+  }: { oldPassword: string; newPassword: string } = req.body;
   try {
-    const { email, password } = req.body;
-    await dataValidation.validateCreatePasswordData(email, password);
-    const restaurantData = await resturantService.createPassword(
-      email,
-      password
+    await jwt.verifyToken(token);
+    await dataValidation.validateChangePasswordData(
+      restaurantId,
+      oldPassword,
+      newPassword
+    );
+    const restaurantData = await resturantService.changePassword(
+      restaurantId,
+      oldPassword,
+      newPassword
     );
     res.status(200).json({
-      status: "Password created successfully",
+      status: "Password changed successfully",
       restaurantData,
     });
   } catch (err: any) {
