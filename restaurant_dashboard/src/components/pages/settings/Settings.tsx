@@ -6,7 +6,7 @@ import RestaurantProfile from "./RestaurantProfile";
 import PasswordChange from "./PasswordChange";
 import { Button, Divider } from "@nextui-org/react";
 
-const Settings = () => {
+const SettingsCard = () => {
   const handleDeleteAccount = () => {
     // Implement account deletion logic here
     console.log("Delete account clicked");
@@ -47,4 +47,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsCard;

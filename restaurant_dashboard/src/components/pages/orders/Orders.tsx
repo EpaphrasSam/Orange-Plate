@@ -9,12 +9,13 @@ import { Order, OrderStatus } from "@/types/orderType";
 import { updateOrderStatus } from "@/services/orderService";
 import { toast } from "react-hot-toast";
 import CustomSpinner from "@/components/ui/CustomSpinner";
+import useSWR from "swr";
 
 interface OrdersProps {
   orders: Order[];
 }
 
-const Orders: React.FC<OrdersProps> = ({ orders }) => {
+const OrdersCard: React.FC<OrdersProps> = ({ orders }) => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(
     orders[0] || null
   );
@@ -22,6 +23,17 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
   const [isLoading, setIsLoading] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+  const { data: locationData, error } = useSWR(
+    selectedOrder?.latitude && selectedOrder?.longitude
+      ? `https://nominatim.openstreetmap.org/reverse?format=json&lat=${selectedOrder.latitude.toString()}&lon=${selectedOrder.longitude.toString()}`
+      : null,
+    fetcher
+  );
+
+  console.log(error);
 
   useEffect(() => {
     if (orders.length > 0) {
@@ -181,6 +193,34 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
               >
                 {selectedOrder?.status}
               </p>
+              <div className="mt-4 flex justify-between">
+                <div>
+                  <p className="text-xs font-bold text-gray-500">Customer</p>
+                  <p className="text-sm">{selectedOrder?.User.name}</p>
+                  <p className="text-sm">{selectedOrder?.User.phone}</p>
+                </div>
+                {(selectedOrder?.status ===
+                  OrderStatus.RiderAssigned.toLowerCase() ||
+                  selectedOrder?.status ===
+                    OrderStatus.OnTheWay.toLowerCase() ||
+                  selectedOrder?.status ===
+                    OrderStatus.Delivered.toLowerCase()) &&
+                  selectedOrder?.Rider && (
+                    <div>
+                      <p className="text-xs font-bold text-gray-500">Rider</p>
+                      <p className="text-sm">{selectedOrder.Rider.name}</p>
+                      <p className="text-sm"></p>
+                    </div>
+                  )}
+              </div>
+              <div className="mt-2">
+                <p className="text-xs font-bold text-gray-500">
+                  Delivery Location
+                </p>
+                <p className="text-sm">
+                  {locationData?.display_name || "***Location not available"}
+                </p>
+              </div>
             </div>
             <div className="flex-grow overflow-y-auto p-4">
               {selectedOrder?.CartItem.map((item) => (
@@ -340,4 +380,4 @@ const Orders: React.FC<OrdersProps> = ({ orders }) => {
   );
 };
 
-export default Orders;
+export default OrdersCard;

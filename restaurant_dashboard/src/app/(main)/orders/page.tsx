@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Orders from "@/components/pages/orders/Orders";
+import OrdersCard from "@/components/pages/orders/Orders";
 import { updateSearchParams } from "@/utils/actions/searchParams.action";
 import { Order, OrderStatus } from "@/types/orderType";
 import { getOrders } from "@/services/orderService";
@@ -43,7 +43,7 @@ const getStatusColor = (status: OrderStatus, isSelected: boolean) => {
   }
 };
 
-export default async function OrdersPage({
+export default async function Orders({
   searchParams,
 }: {
   searchParams: { status?: string };
@@ -101,7 +101,7 @@ export default async function OrdersPage({
           );
         })}
       </div>
-      <Orders orders={statusFilteredOrders} />
+      <OrdersCard orders={statusFilteredOrders} />
     </div>
   );
 }

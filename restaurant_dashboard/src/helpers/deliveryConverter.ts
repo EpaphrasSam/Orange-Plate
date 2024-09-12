@@ -80,7 +80,9 @@ function generateMapData(
 
 function generateQueueOrders(orders: Order[]) {
   return orders
-    .filter((order) => order.status === OrderStatus.Ready.toLowerCase())
+    .filter(
+      (order) => order.status === OrderStatus.LookingForRider.toLowerCase()
+    )
     .map((order) => ({
       id: order.id,
       customerName: order.User.name,

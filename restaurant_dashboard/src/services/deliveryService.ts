@@ -1,5 +1,3 @@
-"use server";
-
 import { auth } from "@/utils/auth";
 import axios from "@/utils/axios";
 import { processDeliveryData } from "@/helpers/deliveryConverter";
@@ -27,3 +25,5 @@ export async function getDeliveryData() {
     throw new Error("Failed to fetch delivery data");
   }
 }
+
+// The getLocationFromCoordinates function has been removed

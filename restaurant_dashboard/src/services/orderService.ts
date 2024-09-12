@@ -13,7 +13,12 @@ export const getOrders = async (): Promise<Order[]> => {
         Authorization: `${session?.user?.token}`,
       },
     });
-    return res.data.orders;
+    const sortedOrders = res.data.orders.sort(
+      (a: Order, b: Order) =>
+        new Date(b.orderTime).getTime() - new Date(a.orderTime).getTime()
+    );
+
+    return sortedOrders;
   } catch (error) {
     console.error("Error fetching orders:", error);
     throw new Error("Failed to fetch orders. Please try again later.");

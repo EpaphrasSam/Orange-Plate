@@ -1,8 +1,8 @@
-import Settings from "@/components/pages/settings/Settings";
-export default function SettingsPage() {
+import SettingsCard from "@/components/pages/settings/Settings";
+export default function Settings() {
   return (
     <div className="p-8">
-      <Settings />
+      <SettingsCard />
     </div>
   );
 }
