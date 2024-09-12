@@ -191,7 +191,7 @@ class OrderCard extends StatefulWidget {
   final String customer;
   final String customerDistance;
   final String orderId;
-  final dynamic total;
+  final double total;
   final String orderTime;
   final Function onOrderAccepted;
   final String orderType;
@@ -343,15 +343,15 @@ class _OrderCardState extends State<OrderCard> {
                   children: [
                     Expanded(
                       child: Text(
-                        'Total: GH₵ ${(widget.total is int ? widget.total.toDouble() : widget.total).toStringAsFixed(2)}',
-                        style: const TextStyle(
+                        'Total: GH₵ ${widget.total.toStringAsFixed(2)}',
+                        style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 16),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

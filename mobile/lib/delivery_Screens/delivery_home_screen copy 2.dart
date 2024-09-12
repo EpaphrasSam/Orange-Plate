@@ -82,20 +82,18 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
 
         String streetName = address['road'] ?? address['street'] ?? '';
         String houseNumber = address['house_number'] ?? '';
-        String neighbourhood =
-            address['neighbourhood'] ?? address['suburb'] ?? '';
-        String city =
-            address['city'] ?? address['town'] ?? address['village'] ?? '';
-        String state = address['state'] ?? '';
+        // String neighbourhood = address['neighbourhood'] ?? address['suburb'] ?? '';
+        // String city = address['city'] ?? address['town'] ?? address['village'] ?? '';
+        // String state = address['state'] ?? '';
         // String country = address['country'] ?? '';
 
         setState(() {
           _currentAddress = [
             if (streetName.isNotEmpty)
               '$streetName${houseNumber.isNotEmpty ? ' $houseNumber' : ''}',
-            if (neighbourhood.isNotEmpty) neighbourhood,
-            if (city.isNotEmpty) city,
-            if (state.isNotEmpty) state,
+            // if (neighbourhood.isNotEmpty) neighbourhood,
+            // if (city.isNotEmpty) city,
+            // if (state.isNotEmpty) state,
             // if (country.isNotEmpty) country,
           ].join(', ');
         });
@@ -165,21 +163,11 @@ class _DeliveryHomeScreenState extends State<DeliveryHomeScreen> {
                         Icon(Icons.location_pin, color: Colors.red),
                         SizedBox(width: 8),
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Your Current Location',
-                                style: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                _currentAddress,
-                                style: TextStyle(fontSize: 14),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                              ),
-                            ],
+                          child: Text(
+                            'Your Location: $_currentAddress',
+                            style: TextStyle(fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
                         ),
                       ],
