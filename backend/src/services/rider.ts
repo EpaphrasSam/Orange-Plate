@@ -162,3 +162,27 @@ export const endTrip = async (riderId: string, orderId: string) => {
     throw new CustomError(err.message, err.statusCode || 400);
   }
 };
+
+//get orders
+export const getRiderStatistics = async (riderId: string) => {
+  try {
+    const riderOrders = await prisma.order.findMany({
+      where: {
+        riderId: riderId,
+      },
+      include: {
+        User: true,
+        restaurant: true,
+        Rider: true,
+        CartItem: {
+          include: {
+            MenuItem: true,
+          },
+        },
+      },
+    });
+    return riderOrders;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 400);
+  }
+};

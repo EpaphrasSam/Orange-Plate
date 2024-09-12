@@ -139,3 +139,62 @@ export const endTrip = async (
     });
   }
 };
+
+//get orders
+export const getRiderStatistics = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token: any = req.headers.authorization;
+  const riderId: string = req.params.id;
+  try {
+    await jwt.verifyToken(token);
+    await dataValidation.getById(riderId);
+    const riderOrders = await riderService.getRiderStatistics(riderId);
+    const totalOrders = riderOrders.length;
+    const deliveredOrders = riderOrders.filter(
+      (order) => order.status === "delivered"
+    );
+    const totalSuccessfulDeliveries = deliveredOrders.length;
+    const totalEarnings = deliveredOrders.reduce(
+      (acc, order) => acc + (order.deliveryFee || 0),
+      0
+    );
+    const weeklyEarnings = riderOrders.reduce((acc, order) => {
+      const orderDate = new Date(order.deliveryTime || "");
+      const currentDate = new Date();
+      const diffTime = Math.abs(currentDate.getTime() - orderDate.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays <= 7) {
+        const dayOfWeek = orderDate.getDay(); // 0 for Sunday, 1 for Monday, etc.
+        acc[dayOfWeek] = (acc[dayOfWeek] || 0) + (order.deliveryFee || 0);
+      }
+      return acc;
+    }, Array(7).fill(0));
+
+    const dailyEarnings = {
+      Sunday: weeklyEarnings[0],
+      Monday: weeklyEarnings[1],
+      Tuesday: weeklyEarnings[2],
+      Wednesday: weeklyEarnings[3],
+      Thursday: weeklyEarnings[4],
+      Friday: weeklyEarnings[5],
+      Saturday: weeklyEarnings[6],
+    };
+
+    res.status(200).json({
+      message: "Rider statistics fetched successfully",
+      totalOrders,
+      totalSuccessfulDeliveries,
+      totalEarnings,
+      dailyEarnings,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message || "Error fetching rider statistics",
+    });
+  }
+};
