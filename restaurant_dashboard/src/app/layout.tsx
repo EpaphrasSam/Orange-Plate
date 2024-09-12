@@ -7,8 +7,9 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Restaurant Dashboard",
-  description: "Restaurant Dashboard",
+  title: "Orange Plate Restaurant",
+  description:
+    "Manage your restaurant operations efficiently with Orange Plate's intuitive dashboard. Track orders, products, and delivery performance in real-time.",
 };
 
 export default function RootLayout({
