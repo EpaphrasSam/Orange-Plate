@@ -1,5 +1,5 @@
 import LoginCard from "@/components/pages/login/LoginCard";
-// import Image from "next/image";
+import Image from "next/image";
 import React from "react";
 
 export default function Login() {
@@ -8,7 +8,7 @@ export default function Login() {
       <div className="relative bg-white w-full md:w-[40%] flex items-center justify-center">
         <LoginCard />
       </div>
-      {/* <div className="relative hidden md:block w-full md:w-[60%] h-full">
+      <div className="relative hidden md:block w-full md:w-[60%] h-full">
         <Image
           src="/Dashboard.png"
           alt="Dashboard background"
@@ -17,7 +17,7 @@ export default function Login() {
           quality={100}
           priority
         />
-      </div> */}
+      </div>
     </div>
   );
 }
