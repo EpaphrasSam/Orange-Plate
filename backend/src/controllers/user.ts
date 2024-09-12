@@ -43,6 +43,30 @@ export const home = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+//get user
+export const getUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId: string = req.params.id;
+    const token: any = req.headers.authorization;
+    await jwt.verifyToken(token);
+    await dataValidation.getById(userId);
+    const user = await userService.getUser(userId);
+    res.status(200).json({
+      message: "User fetched successfully",
+      user,
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};
+
 //get all restaurants
 export const getAllRestaurants = async (
   req: Request,

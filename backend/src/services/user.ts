@@ -45,6 +45,18 @@ export const restaurantCloseBy = async (userLocation: {
   }
 };
 
+//get user
+export const getUser = async (userId: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    return user;
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
+
 //get all restaurants
 export const getAllRestaurants = async () => {
   try {

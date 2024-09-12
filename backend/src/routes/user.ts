@@ -13,4 +13,6 @@ router.get("/cart-items/:id", userController.getCartItems);
 router.post("/place-order/:id", userController.placeOrder);
 router.get("/orders/:id", userController.getOrders);
 
+router.get("/:id", userController.getUser);
+
 export default router;
