@@ -84,3 +84,22 @@ export const createRider = async (
     });
   }
 };
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, newPassword, role } = req.body;
+    await dataValidation.resetPasswordData(email, newPassword, role);
+    res.status(200).json({
+      message: "Password reset successfully",
+    });
+  } catch (err: any) {
+    next({
+      status: err.statusCode || 400,
+      message: err.message,
+    });
+  }
+};

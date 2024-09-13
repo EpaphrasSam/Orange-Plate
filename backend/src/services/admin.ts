@@ -83,3 +83,53 @@ export const createRider = async (data: {
     throw new CustomError(err.message, err.statusCode);
   }
 };
+
+//reset password
+export const resetPassword = async (data: {
+  email: string;
+  newPassword: string;
+  role: string;
+}) => {
+  try {
+    const role = data.role.toLowerCase();
+    const hashedPassword = await bcrypt.hashPassword(data.newPassword);
+    if (role === "restaurant") {
+      const restaurant = await prisma.restaurant.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+      if (!restaurant) {
+        throw new CustomError("Restaurant not found", 404);
+      }
+      await prisma.restaurant.update({
+        where: {
+          email: data.email,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    }
+    if (role === "rider") {
+      const rider = await prisma.rider.findFirst({
+        where: {
+          email: data.email,
+        },
+      });
+      if (!rider) {
+        throw new CustomError("Rider not found", 404);
+      }
+      await prisma.rider.update({
+        where: {
+          email: data.email,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    }
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode);
+  }
+};

@@ -602,3 +602,33 @@ export const validatePlaceOrderData = async (
     throw new CustomError(err.message, err.statusCode || 500);
   }
 };
+
+export const resetPasswordData = async (
+  email: string,
+  newPassword: string,
+  role: string
+) => {
+  try {
+    //check if email and newPassword are not empty
+    if (!email || !newPassword || !role) {
+      throw new CustomError("Email, new password and role are required", 422);
+    }
+    //check if email, role and newPassword are of type string
+    if (
+      typeof email !== "string" ||
+      typeof newPassword !== "string" ||
+      typeof role !== "string"
+    ) {
+      throw new CustomError(
+        "Email, role and new password must be of type string",
+        422
+      );
+    }
+    //check if role is a valid role
+    if (role.toLowerCase() !== "rider" && role.toLowerCase() !== "restaurant") {
+      throw new CustomError("Invalid role", 422);
+    }
+  } catch (err: any) {
+    throw new CustomError(err.message, err.statusCode || 500);
+  }
+};
