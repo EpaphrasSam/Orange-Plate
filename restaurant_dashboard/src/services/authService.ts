@@ -82,3 +82,21 @@ export async function updateProfile(restaurantId: string, data: any) {
     throw error;
   }
 }
+
+export const changePassword = async (
+  oldPassword: string,
+  newPassword: string
+) => {
+  try {
+    const session = await auth();
+    const res = await axios.put(
+      `/restaurant/change-password/${session?.user?.id}`,
+      { oldPassword, newPassword },
+      { headers: { Authorization: `${session?.user?.token!}` } }
+    );
+    return res.data;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw error;
+  }
+};

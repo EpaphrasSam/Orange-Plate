@@ -90,7 +90,6 @@ const RestaurantProfile = () => {
   };
 
   const handleLogoUpload = (result: any) => {
-    console.log(result);
     const imageUrl = result.info.secure_url;
     setProfile((prev) => ({ ...prev, image: imageUrl }));
     toast.success("Image uploaded successfully");
@@ -178,6 +177,7 @@ const RestaurantProfile = () => {
           type="submit"
           className="md:w-[200px] w-auto bg-[#FCAF01] text-white"
           isLoading={isLoading}
+          spinner={<CustomSpinner />}
         >
           {isLoading ? "Saving..." : "Save Profile"}
         </Button>
