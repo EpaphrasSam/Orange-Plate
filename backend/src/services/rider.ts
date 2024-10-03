@@ -3,6 +3,7 @@ import prisma from "../util/prisma";
 import CustomError from "../util/error";
 import * as bcrypt from "../util/bcrypt";
 import * as jwt from "../util/jwt";
+import * as sendSMS from "../util/sendSMS";
 
 //create password
 export const createPassword = async (email: string, password: string) => {};
@@ -122,6 +123,7 @@ export const getRiderOrders = async (riderId: string) => {
 //end trip
 export const endTrip = async (riderId: string, orderId: string) => {
   try {
+    await sendSMS.sendSMS();
     const order = await prisma.order.findFirst({
       where: {
         id: orderId,
