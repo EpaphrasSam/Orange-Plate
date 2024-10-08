@@ -1,10 +1,9 @@
-import express, { Request, Response } from 'express';
-   
-   const router = express.Router();
+import express from "express";
 
-   router.get('/', (req: Request, res: Response) => {
-       res.send('Hello, World!');
-   });
+const router = express.Router();
 
-   export default router;
-  
+router.get("/", (req, res) => {
+  res.send("Hello, welcome to Orange Plate!");
+});
+
+export default router;
